@@ -69,9 +69,9 @@ public class FastAPIConfig : IConfigLoaderWithParams
 }
 public static partial class Settings
 {  //Api domain
-    public static string BaseAPIUrl = "https://plant-hero.cameo.tw";
+    public static string BaseAPIUrl = "";
     //引導玩家登入的Url
-    public static string LoginPageUrl = "https://adl.edu.tw/HomePage/login/?sys=planting";
+    public static string LoginPageUrl = "";
 
     //fapi
     public static string BaseFapi { get { return BaseAPIUrl + "/fapi/"; } }
