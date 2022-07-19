@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using LitJson;
 using System;
 using UnityEngine.Networking;
-
 namespace Cameo
 {
     public class FileRequestHelper :Singleton<FileRequestHelper>
@@ -40,12 +39,13 @@ namespace Cameo
                 } 
             }
         }
-
+       
         public async Task<T> LoadJson<T>(string url, Func<JsonData, T> parser) where T : class
         {
-            //Debug.Log("LoadJson with parser: " + url);
+            
+           //Debug.Log("LoadJson with parser: " + url);
 
-            UnityWebRequest www = new UnityWebRequest(url);
+           UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
 
@@ -213,7 +213,7 @@ namespace Cameo
                     }
                     catch (System.Exception e)
                     {
-                        Debug.LogError("表單格式錯誤"+ e.ToString());
+                        Debug.LogError("表單格式錯誤");
                         for (int ii = 0; i < data.Length; i++)
                         {
                             Debug.Log(data[ii]);
