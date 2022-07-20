@@ -13,11 +13,11 @@ public class UniversalDataLoader : IDataLoader<string>
     {
         DownloadInfo downloadInfo = DownloadInfoManager.Instance.DownloadInfo(SheetID);
 
-        string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", Settings.BaseDataUrl,
-            Settings.AccountKey, user,
-            Settings.TokenKey, token,
-            Settings.SpreadSheetKey, downloadInfo.SpreadSheet,
-            Settings.WorkSheetKey, downloadInfo.WorkSheet);
+        string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseDataUrl,
+            FastAPISettings.AccountKey, user,
+            FastAPISettings.TokenKey, token,
+            FastAPISettings.SpreadSheetKey, downloadInfo.SpreadSheet,
+            FastAPISettings.WorkSheetKey, downloadInfo.WorkSheet);
 
         string jsonString = await FileRequestHelper.Instance.LoadJsonString(url);
 

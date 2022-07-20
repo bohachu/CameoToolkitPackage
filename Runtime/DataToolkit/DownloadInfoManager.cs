@@ -28,9 +28,9 @@ namespace Cameo
 
         private async Task runAsyncTask(string userAccount, string token)
         {
-            DownloadInfo[] dataIndices = await FileRequestHelper.Instance.LoadArray<DownloadInfo>(Settings.DataIndexSpreadSheet,
-                isDevelopVersion ? Settings.DataIndexWorkSheetDevelop : Settings.DataIndexWorkSheet,
-                Settings.DataIndexStartRow, parser, userAccount, token);
+            DownloadInfo[] dataIndices = await FileRequestHelper.Instance.LoadArray<DownloadInfo>(FastAPISettings.DataIndexSpreadSheet,
+                isDevelopVersion ? FastAPISettings.DataIndexWorkSheetDevelop : FastAPISettings.DataIndexWorkSheet,
+                FastAPISettings.DataIndexStartRow, parser, userAccount, token);
 
             indexMap = new Dictionary<string, DownloadInfo>();
 

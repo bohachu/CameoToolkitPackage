@@ -135,11 +135,11 @@ namespace Cameo
         {
             T[] returnArray = null;
 
-            string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", Settings.BaseDataUrl,
-                Settings.AccountKey, userAccount,
-                Settings.TokenKey, token,
-                Settings.SpreadSheetKey, spreadSheet,
-                Settings.WorkSheetKey, workSheet);
+            string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseDataUrl,
+                FastAPISettings.AccountKey, userAccount,
+                FastAPISettings.TokenKey, token,
+                FastAPISettings.SpreadSheetKey, spreadSheet,
+                FastAPISettings.WorkSheetKey, workSheet);
 
             UnityWebRequest www = new UnityWebRequest(url);
 
@@ -177,11 +177,11 @@ namespace Cameo
         {
             T[] returnArray = null;
             List<T> dataArray = new List<T>();
-            string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", Settings.BaseListUrl,
-                Settings.AccountKey, UserAccount,
-                Settings.TokenKey, Token,
-                Settings.SpreadSheetKey, spreadSheet,
-                Settings.WorkSheetKey, workSheet);
+            string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseListUrl,
+                FastAPISettings.AccountKey, UserAccount,
+                FastAPISettings.TokenKey, Token,
+                FastAPISettings.SpreadSheetKey, spreadSheet,
+                FastAPISettings.WorkSheetKey, workSheet);
 
           //  Debug.Log(url);
 
@@ -229,13 +229,13 @@ namespace Cameo
 
         public async Task<string> UploadGameData(string fileName, object data, string UserAccount, string Token)
         {
-            UnityWebRequest www = new UnityWebRequest(Settings.SetRequestUrl, "POST");
+            UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetRequestUrl, "POST");
 
             Dictionary<string, string> requestBody = new Dictionary<string, string>();
-            requestBody[Settings.AccountKey] = UserAccount; 
-            requestBody[Settings.TokenKey] = Token;
-            requestBody[Settings.FileKey] = fileName;
-            requestBody[Settings.ContentKey] = JsonMapper.ToJson(data);
+            requestBody[FastAPISettings.AccountKey] = UserAccount; 
+            requestBody[FastAPISettings.TokenKey] = Token;
+            requestBody[FastAPISettings.FileKey] = fileName;
+            requestBody[FastAPISettings.ContentKey] = JsonMapper.ToJson(data);
 
             string jsonStr = JsonMapper.ToJson(requestBody);
 
@@ -263,13 +263,13 @@ namespace Cameo
 
         public async Task<string> UploadMessageData(List<string> readedMessageIDs, List<string> unreadedMessageIDs,string UserAccount, string Token)
         {
-            UnityWebRequest www = new UnityWebRequest(Settings.SetMessageReadUrl, "POST");
+            UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetMessageReadUrl, "POST");
 
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
-            requestBody[Settings.AccountKey] = UserAccount;
-            requestBody[Settings.TokenKey] = Token;
-            requestBody[Settings.ReadMessageListKey] = readedMessageIDs;
-            requestBody[Settings.UnreadMessageListKey] = unreadedMessageIDs;
+            requestBody[FastAPISettings.AccountKey] = UserAccount;
+            requestBody[FastAPISettings.TokenKey] = Token;
+            requestBody[FastAPISettings.ReadMessageListKey] = readedMessageIDs;
+            requestBody[FastAPISettings.UnreadMessageListKey] = unreadedMessageIDs;
 
             string jsonStr = JsonMapper.ToJson(requestBody);
 
@@ -295,13 +295,13 @@ namespace Cameo
 
         public async Task<string> UploadLog(string logTable, string logs, string UserAccount, string Token)
         {
-            UnityWebRequest www = new UnityWebRequest(Settings.LogUploadUrl, "POST");
+            UnityWebRequest www = new UnityWebRequest(FastAPISettings.LogUploadUrl, "POST");
 
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
-            requestBody[Settings.AccountKey] = UserAccount;
-            requestBody[Settings.TokenKey] = Token;
-            requestBody[Settings.TableKey] = logTable;
-            requestBody[Settings.LogKey] = logs;
+            requestBody[FastAPISettings.AccountKey] = UserAccount;
+            requestBody[FastAPISettings.TokenKey] = Token;
+            requestBody[FastAPISettings.TableKey] = logTable;
+            requestBody[FastAPISettings.LogKey] = logs;
 
             string jsonStr = JsonMapper.ToJson(requestBody);
 
@@ -327,11 +327,11 @@ namespace Cameo
 
         public async Task<string> UploadImage(byte[] file, string folder, string fileName)
         {
-            string url = string.Format("{0}{1}/", Settings.UploadFileUrl, folder);
+            string url = string.Format("{0}{1}/", FastAPISettings.UploadFileUrl, folder);
 
             WWWForm form = new WWWForm();
 
-            form.AddBinaryData(Settings.UploadFileKey, file, fileName, "image/jpeg");
+            form.AddBinaryData(FastAPISettings.UploadFileKey, file, fileName, "image/jpeg");
 
             UnityWebRequest www = UnityWebRequest.Post(url, form);
 
@@ -392,7 +392,7 @@ namespace Cameo
         {
             T[] returnArray = null;
 
-            UnityWebRequest www = new UnityWebRequest(Settings.BaseFapi, "POST");
+            UnityWebRequest www = new UnityWebRequest(FastAPISettings.BaseFapi, "POST");
 
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
             requestBody["command"] = "file";
@@ -444,7 +444,7 @@ namespace Cameo
         {
             T[] returnArray = null;
 
-            UnityWebRequest www = new UnityWebRequest(Settings.BaseFapi, "POST");
+            UnityWebRequest www = new UnityWebRequest(FastAPISettings.BaseFapi, "POST");
 
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
             requestBody["command"] = "csv";
@@ -498,7 +498,7 @@ namespace Cameo
         /// <returns></returns>
         public async Task<string> AppendAndCreate(string path, string[] columns, string[] values)
         {
-            UnityWebRequest www = new UnityWebRequest(Settings.BaseFapi, "POST");
+            UnityWebRequest www = new UnityWebRequest(FastAPISettings.BaseFapi, "POST");
 
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
             requestBody["command"] = "csv";
