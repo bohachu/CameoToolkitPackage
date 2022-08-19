@@ -16,7 +16,6 @@ namespace Cameo
         public static async Task<T> LoadConfig<T>(string configName, Func<JsonData, T> parser) where T : class
         {
             string configJsonStr;
-            T returnConfig = null;
             string  configUrl = Path.Combine(Application.streamingAssetsPath, configName + ".json");
 #if UNITY_EDITOR
           
@@ -31,7 +30,7 @@ namespace Cameo
             {
                 JsonData jsonData = JsonMapper.ToObject(configJsonStr);
                 T obj = parser(jsonData);
-                return returnConfig;
+                return obj;
             }
             else
             {

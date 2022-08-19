@@ -18,6 +18,9 @@ namespace Cameo
             public string APIDomain;
             public string GameDataUrl;
             public string LoginUrl;
+            public string FileIndex;
+            public string GetkeyUrl;
+            public string SetkeyUrl;
         }
         private const string DefaultUrlKey = "Default";
 
@@ -67,6 +70,11 @@ namespace Cameo
             urlDefine = await CongigTool.LoadConfig<UrlDef>(typeof(UrlDef).Name.ToString(), parser);
             FastAPISettings.BaseAPIUrl = urlDefine.APIDomain;
             FastAPISettings.LoginPageUrl = urlDefine.LoginUrl;
+            FastAPISettings.DataIndexSpreadSheet = urlDefine.FileIndex;
+            FastAPISettings.key_value_get = urlDefine.GetkeyUrl;
+            FastAPISettings.key_value_set = urlDefine.SetkeyUrl;
+            //FastAPISettings.LoginPageUrl = urlDefine.GameDataUrl;
+
         }
     }
 
@@ -89,7 +97,7 @@ namespace Cameo
         public const string ReadMessageListKey = "lst_message_id_set_true";
         public const string UnreadMessageListKey = "lst_message_id_set_false";
         //檔案索引檔的下載設定
-        public const string DataIndexSpreadSheet = "FileIndex";
+        public static string DataIndexSpreadSheet = "FileIndex";
         public const string DataIndexWorkSheet = "Index";
         public const string DataIndexWorkSheetDevelop = "IndexDevelop";
         public const int DataIndexStartRow = 0;
@@ -113,7 +121,8 @@ namespace Cameo
         public static string SetRequestUrl { get { return BaseAPIUrl + "/key_value/set/"; } }
         public static string UploadFileUrl { get { return BaseAPIUrl + "/upload/upload/?str_directory="; } }
         public const string UploadFileKey = "lst_files";
-
+        public static string key_value_get = "/key_value/get";
+        public static string key_value_set = "/key_value/set";
     }
 
 }
