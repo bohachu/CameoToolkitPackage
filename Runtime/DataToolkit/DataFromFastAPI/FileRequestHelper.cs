@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LitJson;
 using System;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 namespace Cameo
 {
     public class FileRequestHelper :Singleton<FileRequestHelper>
@@ -23,21 +24,25 @@ namespace Cameo
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogErrorFormat(www.error);
+                www.Dispose();
                 return null;
             }
             else
             {
+                var data = www.downloadHandler.text;
+                www.Dispose();
                 try
                 {
-                    return JsonMapper.ToObject<T>(www.downloadHandler.text);
+                    return JsonConvert.DeserializeObject<T>(data); //JsonMapper.ToObject<T>(data);
                 }
                 catch(Exception e)
                 {
-                    Debug.LogFormat("Load {0} error: {1},{2}", url, www.downloadHandler.text, e);
+                    Debug.LogFormat("Load {0} error: {1},{2}", url, data, e);
 
                     return null;
                 } 
             }
+           
         }
        
         public async Task<T> LoadJson<T>(string url, Func<JsonData, T> parser) where T : class
@@ -54,13 +59,16 @@ namespace Cameo
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogErrorFormat(www.error);
+                www.Dispose();
                 return null;
             }
             else
             {
                 //ebug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
                 //Debug.Log(www.downloadHandler.text);
-                return parser(JsonMapper.ToObject(www.downloadHandler.text));
+                var data = www.downloadHandler.text;
+                www.Dispose();
+                return parser(JsonMapper.ToObject(data));
             }
         }
 
@@ -77,12 +85,15 @@ namespace Cameo
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.Log(www.error);
+                www.Dispose();
                 return null;
             }
             else
             {
                 //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
-                return www.downloadHandler.text;
+                var data = www.downloadHandler.text;
+                www.Dispose();
+                return data;
             }
         }
 
@@ -98,6 +109,7 @@ namespace Cameo
             {
                 Debug.Log(www.error);
             }
+            www.Dispose();
         }
 
         public async Task<RequestResult> InvokeAPI<T>(string url, Func<JsonData, T> parser) where T:class
@@ -126,7 +138,7 @@ namespace Cameo
 
                 result.ErrorMsg = "";
             }
-
+            www.Dispose();
             return result;
         }
 
@@ -168,7 +180,7 @@ namespace Cameo
                     returnArray[i - index] = obj;
                 }
             }
-
+            www.Dispose();
             return returnArray;
         }
 
@@ -224,6 +236,7 @@ namespace Cameo
                 GC.Collect();
             }
             returnArray = dataArray.ToArray();
+            www.Dispose();
             return returnArray;
         }
 
@@ -251,12 +264,15 @@ namespace Cameo
             if (www.result == UnityWebRequest.Result.ConnectionError)
             {
                 Debug.Log("Error While Sending: " + www.error);
-                return www.error;
+                var outData = www.error;
+                www.Dispose();
+                return outData;
             }
             else
             {
+                www.Dispose();
                 //Debug.Log("Received: " + www.downloadHandler.text);
-                return null;
+                return "";
             }
             
         }
@@ -280,16 +296,19 @@ namespace Cameo
             www.SetRequestHeader("Content-Type", "application/json");
 
             await www.SendWebRequest();
-
+            jsonToSend = null;
+            GC.Collect();
             if (www.result == UnityWebRequest.Result.ConnectionError)
             {
                 Debug.Log("Error While Sending: " + www.error);
-                return www.error;
+                var outData = www.error;
+                www.Dispose();
+                return outData;
             }
             else
             {
                 //Debug.Log("Received: " + www.downloadHandler.text);
-                return null;
+                return "";
             }
         }
 
@@ -312,16 +331,19 @@ namespace Cameo
             www.SetRequestHeader("Content-Type", "application/json");
 
             await www.SendWebRequest();
-
+            jsonToSend = null;
+            GC.Collect();
             if (www.result == UnityWebRequest.Result.ConnectionError)
             {
                 Debug.Log("Error While Sending: " + www.error);
-                return www.error;
+                var outData = www.error;
+                www.Dispose();
+                return outData;
             }
             else
             {
                 //Debug.Log("Received: " + www.downloadHandler.text);
-                return null;
+                return "";
             }
         }
 
@@ -340,12 +362,14 @@ namespace Cameo
             if (www.result == UnityWebRequest.Result.ConnectionError)
             {
                 Debug.Log("Error While Sending: " + www.error);
-                return www.error;
+                var outData = www.error;
+                www.Dispose();
+                return outData;
             }
             else
             {
                 //Debug.Log("Received: " + www.downloadHandler.text);
-                return null;
+                return "";
             }
         }
 
@@ -362,13 +386,13 @@ namespace Cameo
             if (www.result == UnityWebRequest.Result.ConnectionError)
             {
                 Debug.Log("Error While Sending: " + www.error);
-
+                www.Dispose();
                 return null;
             }
             else if(www.downloadHandler.text == "Not Found")
             {
                 //Debug.Log("Download image " + www.downloadHandler.text);
-
+                www.Dispose();
                 return null;
             }
             else
@@ -378,7 +402,7 @@ namespace Cameo
                 Texture2D tex = new Texture2D(2, 2);
 
                 tex.LoadImage(www.downloadHandler.data, false);
-
+                www.Dispose();
                 return tex;
             }
         }
@@ -433,7 +457,7 @@ namespace Cameo
                     returnArray[i] = parser(JsonMapper.ToObject(jsonData[i].ToString()));
                 }
             }
-
+            www.Dispose();
             return returnArray;
         }
 
@@ -485,7 +509,7 @@ namespace Cameo
                     returnArray[i] = parser(JsonMapper.ToObject<string[]>(jsonData[i].ToJson()));
                 }
             }
-
+            www.Dispose();
             return returnArray;
         }
 
