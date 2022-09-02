@@ -6,6 +6,8 @@ using LitJson;
 using System;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
+using System.Net;
+
 namespace Cameo
 {
     public class FileRequestHelper :Singleton<FileRequestHelper>
@@ -18,7 +20,8 @@ namespace Cameo
             UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -53,7 +56,8 @@ namespace Cameo
            UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -79,7 +83,8 @@ namespace Cameo
             UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -102,7 +107,8 @@ namespace Cameo
             //Debug.Log(url);
 
             UnityWebRequest www = new UnityWebRequest(url);
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -119,7 +125,8 @@ namespace Cameo
             UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             RequestResult result = new RequestResult();
@@ -156,7 +163,8 @@ namespace Cameo
             UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -200,7 +208,8 @@ namespace Cameo
             UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -257,7 +266,8 @@ namespace Cameo
             www.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonToSend);
             www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
             jsonToSend = null;
             GC.Collect();
@@ -294,7 +304,8 @@ namespace Cameo
             www.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonToSend);
             www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
             jsonToSend = null;
             GC.Collect();
@@ -324,14 +335,15 @@ namespace Cameo
 
             string jsonStr = JsonMapper.ToJson(requestBody);
 
-            byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
-
-            www.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonToSend);
+            //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
+            var jsonRaw = System.Text.Encoding.UTF8.GetBytes(jsonStr);
+            www.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonRaw);
             www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
-            jsonToSend = null;
+            jsonRaw = null;
             GC.Collect();
             if (www.result == UnityWebRequest.Result.ConnectionError)
             {
@@ -356,7 +368,8 @@ namespace Cameo
             form.AddBinaryData(FastAPISettings.UploadFileKey, file, fileName, "image/jpeg");
 
             UnityWebRequest www = UnityWebRequest.Post(url, form);
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result == UnityWebRequest.Result.ConnectionError)
@@ -380,7 +393,8 @@ namespace Cameo
             www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
 
             www.SetRequestHeader("Content-Type", "image/jpeg");
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result == UnityWebRequest.Result.ConnectionError)
@@ -427,7 +441,8 @@ namespace Cameo
 
             Debug.Log(www.url);
             Debug.Log(jsonStr);
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
 
             www.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonToSend);
@@ -486,7 +501,8 @@ namespace Cameo
             www.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonToSend);
             www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
-
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
