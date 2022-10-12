@@ -89,6 +89,7 @@ namespace Cameo
 
             if (www.result != UnityWebRequest.Result.Success)
             {
+                Debug.Log("下載sheet失敗" + url);
                 Debug.Log(www.error);
                 www.Dispose();
                 return null;
