@@ -1,10 +1,10 @@
 {
   "name": "com.cameo.toolkit",
   "displayName": "CameoToolkit",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "unity": "2021.3",
   "unityRelease": "0a10",
-  "description": "CameoToolkit is the base tool for Unity.\nSystemAudioCenter : Player audio clip\nDataToolKit :  load json data from google sheet and streamAssets\nThridParty Plugin: LitJson",
+  "description": "CameoToolkit is the base tool for Unity.\nSystemAudioCenter : Player audio clip\nDataToolKit :  load json data from google sheet and streamAssets\nThridParty Plugin: LitJson\nadd UI tools , and two plugins for UI : sirinx, leantween",
   "keywords": [
     "CameoToolkit",
     "UI",
