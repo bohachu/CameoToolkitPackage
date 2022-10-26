@@ -15,7 +15,7 @@ namespace Cameo
     {
         public static async Task<T> LoadConfig<T>(string configName, Func<JsonData, T> parser) where T : class
         {
-            string configJsonStr;
+            string configJsonStr="";
             string  configUrl = Path.Combine(Application.streamingAssetsPath, configName + ".json");
 #if UNITY_EDITOR
           
