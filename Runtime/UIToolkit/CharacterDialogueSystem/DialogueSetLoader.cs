@@ -63,7 +63,8 @@ namespace Cameo
                         FastAPISettings.SpreadSheetKey, SpreadSheet,
                         FastAPISettings.WorkSheetKey, WorkSheet);
                 string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
-
+                Debug.Log("下載對白資料成功");
+                Debug.Log(jsonStr);
                 dialogDatas = JsonConvert.DeserializeObject<List<DialogData>>(jsonStr);
 
             }
@@ -90,7 +91,7 @@ namespace Cameo
         public IEnumerator Initializ(string SpreadSheetName, string WorksheetName, string UserAccount, string Token)
         {
             Setup(SpreadSheetName, WorksheetName);
-            yield return dialogueDownloadSets.loadDataSets(SpreadSheetName, WorksheetName, UserAccount, Token);
+            yield return dialogueDownloadSets.loadDataSets(SpreadSheetName, WorksheetName, UserAccount, Token).AsIEnumerator();
             DialogueSets = dialogueDownloadSets.GetDialogueSetByGroupID();
         }
   
