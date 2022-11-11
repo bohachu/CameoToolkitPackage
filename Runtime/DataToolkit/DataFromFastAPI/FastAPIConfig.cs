@@ -7,6 +7,7 @@ using System.Collections;
 namespace Cameo
 {
     /// <summary>
+    // 設定FastAPI所有ＵＲＬ與funtion name, parameter name
     /// 依據目前運行的url來判斷要使用哪一個api domain,
     /// 藉此區分測試版本與正式版本兩版本不同的api
     /// </summary>
@@ -15,12 +16,12 @@ namespace Cameo
         [System.Serializable]
         public class UrlDef
         {
-            public string APIDomain;
-            public string GameDataUrl;
-            public string LoginUrl;
-            public string FileIndex;
-            public string GetkeyUrl;
-            public string SetkeyUrl;
+            public string APIDomain;  //FastApi 服務主機url
+            public string GameDataUrl; //可替換遊戲資料url
+            public string LoginUrl; //使用者登入url模組
+            public string FileIndex;//所有檔案索引url
+            public string GetkeyUrl;//雲端檔案讀取api url   
+            public string SetkeyUrl;//雲端檔案寫入api url
         }
         private const string DefaultUrlKey = "Default";
 

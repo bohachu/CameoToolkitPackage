@@ -150,7 +150,7 @@ namespace Cameo
             return result;
         }
 
-        //以JsonObject Array方式載入(含Key)
+        //以JsonObject Array方式載入sheet資料，(回傳資料包含Key名稱)
         public async Task<T[]> LoadArray<T>(string spreadSheet, string workSheet, int index, Func<JsonData, T> parser, string userAccount,string token) where T : class
         {
             T[] returnArray = null;
