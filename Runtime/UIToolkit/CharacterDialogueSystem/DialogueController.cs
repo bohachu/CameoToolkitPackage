@@ -379,6 +379,8 @@ public class DialogueController : MonoBehaviour
     public void ShowHideDialogue(bool isShow)
     {
         DialogRoot.SetActive(isShow);
+        BGImage.gameObject.SetActive(isShow);
+        CenterImage.gameObject.SetActive(isShow);
         //dialogueBTN.gameObject.SetActive(isShow);
 
     }
@@ -432,16 +434,18 @@ public class DialogueController : MonoBehaviour
         DialogueText.text = replacePlayerName(dialogueActionUnit.Dialogue);
         if(dialogueActionUnit.IsBGChange)
         {
-            BGImage.gameObject.SetActive(true);
+            
             BGImage.sprite = dialogueActionUnit.BGImage;
 
             if (dialogueActionUnit.BGImage != null)
             {
+                BGImage.gameObject.SetActive(true);
                 BGImage.color = Color.white;
 
             }
             else
             {
+                BGImage.gameObject.SetActive(false);
                 BGImage.color = new Color(1,1,1,0);
             }
 
@@ -449,16 +453,17 @@ public class DialogueController : MonoBehaviour
         }
         if (dialogueActionUnit.IsCenterImgChange)
         {
-            CenterImage.gameObject.SetActive(true);
+            
             CenterImage.sprite = dialogueActionUnit.CenterImg;
             CenterImage.color = Color.white;
             if (dialogueActionUnit.CenterImg != null)
             {
                 CenterImage.color = Color.white;
-
+                CenterImage.gameObject.SetActive(true);
             }
             else
-            {
+            {   
+                CenterImage.gameObject.SetActive(false);
                 CenterImage.color = new Color(1, 1, 1, 0);
             }
         }

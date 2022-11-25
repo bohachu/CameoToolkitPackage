@@ -21,6 +21,12 @@ namespace Cameo
     [System.Serializable]
     public class DialogueDataSet
     {
+        public enum PresetImageCommand
+        {
+            None,
+            Show,
+            Hide
+        }
         public List<DialogData> dialogDatas;
         public List<DialogueSet> ConvertToDialogueSet(Dictionary<string,Sprite> Images)
         {
@@ -39,20 +45,36 @@ namespace Cameo
             {
                 var oneDialogue = new DialogueActionUnit(obj.Dialogue);
                 oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
+               
+                if(obj.BGImage == PresetImageCommand.Hide.ToString())
+                {
+                    oneDialogue.BGImage = null;
+                    oneDialogue.IsBGChange=true;
+                }
+                if(obj.CenterImage == PresetImageCommand.Hide.ToString())
+                {
+                    oneDialogue.CenterImg = null;
+                    oneDialogue.IsCenterImgChange=true;
+                }
                 if(Images.ContainsKey(obj.BGImage))
                 {
+                    Debug.Log("找到圖片，放入對白:"+obj.BGImage);
                     oneDialogue.BGImage = Images[obj.BGImage];
+                    oneDialogue.IsBGChange=true;
                 }
                 if(Images.ContainsKey(obj.CenterImage))
                 {
                     oneDialogue.CenterImg = Images[obj.CenterImage];
+                    oneDialogue.IsCenterImgChange=true;
                 }
+
                 if (dialogueFilter.ContainsKey(obj.GroupID))
                 {
                     dialogueFilter[obj.GroupID].AdvanceDialogues.Add(oneDialogue);
                 }
                 else
                 {
+                    //Debug.Log("新增對話組:"+obj.GroupID); //每一組新的對話，都會重新設定背景圖片
                     DialogueSet oneSet = new DialogueSet();
                     oneSet.AdvanceDialogues.Add(oneDialogue);
                     dialogueFilter.Add(obj.GroupID, oneSet);
@@ -105,11 +127,13 @@ namespace Cameo
             List<string> imageURL = new List<string>();
             foreach (var obj in dialogueDownloadSets.dialogDatas)
             {
-                if (!string.IsNullOrEmpty(obj.BGImage))
+                
+                if (!string.IsNullOrEmpty(obj.BGImage)&& (obj.BGImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
                 {
+                    //Debug.Log("下載對話背景圖片:" + obj.BGImage);
                     imageURL.Add(obj.BGImage);
                 }
-                if (!string.IsNullOrEmpty(obj.CenterImage))
+                if (!string.IsNullOrEmpty(obj.CenterImage)&&(obj.CenterImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
                 {
                     imageURL.Add(obj.CenterImage);
                 }
@@ -118,13 +142,16 @@ namespace Cameo
             DialogueSets = dialogueDownloadSets.GetDialogueSetByGroupID(imageDownloadHelper.LoadedImages);
         }
   
-        public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd)
+        public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd=null)
         {
             //Debug.Log("啟動對話："+GroupID);
-            DialogueSets[GroupID].StartDialogues(() => {
-                DialogueSets[GroupID].Hide();
-                OnDialogueEnd.Invoke();
-            });
+            if(OnDialogueEnd!=null)
+                DialogueSets[GroupID].StartDialogues(() => {
+                    DialogueSets[GroupID].Hide();
+                    OnDialogueEnd.Invoke();
+                });
+            else
+                DialogueSets[GroupID].StartDialogues();
         }
 
     }
