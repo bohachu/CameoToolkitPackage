@@ -45,7 +45,6 @@ namespace Cameo
             {
                 var oneDialogue = new DialogueActionUnit(obj.Dialogue);
                 oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
-               
                 if(obj.BGImage == PresetImageCommand.Hide.ToString())
                 {
                     oneDialogue.BGImage = null;
@@ -56,17 +55,25 @@ namespace Cameo
                     oneDialogue.CenterImg = null;
                     oneDialogue.IsCenterImgChange=true;
                 }
-                if(Images.ContainsKey(obj.BGImage))
+               
+                if(Images!=null)
                 {
-                    Debug.Log("找到圖片，放入對白:"+obj.BGImage);
-                    oneDialogue.BGImage = Images[obj.BGImage];
-                    oneDialogue.IsBGChange=true;
+                    if(!string.IsNullOrWhiteSpace(obj.BGImage))
+                    if(Images.ContainsKey(obj.BGImage))
+                    {
+                        Debug.Log("找到圖片，放入對白:"+obj.BGImage);
+                        oneDialogue.BGImage = Images[obj.BGImage];
+                        oneDialogue.IsBGChange=true;
+                    }
+                    
+                    if(!string.IsNullOrWhiteSpace(obj.BGImage))
+                    if(Images.ContainsKey(obj.CenterImage))
+                    {
+                        oneDialogue.CenterImg = Images[obj.CenterImage];
+                        oneDialogue.IsCenterImgChange=true;
+                    }
                 }
-                if(Images.ContainsKey(obj.CenterImage))
-                {
-                    oneDialogue.CenterImg = Images[obj.CenterImage];
-                    oneDialogue.IsCenterImgChange=true;
-                }
+                
 
                 if (dialogueFilter.ContainsKey(obj.GroupID))
                 {
@@ -144,6 +151,18 @@ namespace Cameo
   
         public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd=null)
         {
+            if(string.IsNullOrWhiteSpace(GroupID))
+            {
+                Debug.Log("對話組ID為空，跳過對話直接執行下一步");
+                if(OnDialogueEnd!=null) OnDialogueEnd.Invoke();
+                return;
+            }
+            if(!DialogueSets.ContainsKey(GroupID))
+            {
+                Debug.LogError("對話群組不存在，請檢查上搞系統："+ GroupID);
+                if(OnDialogueEnd!=null) OnDialogueEnd.Invoke();
+                return;
+            }
             //Debug.Log("啟動對話："+GroupID);
             if(OnDialogueEnd!=null)
                 DialogueSets[GroupID].StartDialogues(() => {
