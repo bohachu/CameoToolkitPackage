@@ -15,14 +15,16 @@ namespace Cameo
         public string Dialogue;
         //public int RoleIndex;
         public string RoleName;
+        public string BGImage;
+        public string CenterImage;
     }
     [System.Serializable]
     public class DialogueDataSet
     {
         public List<DialogData> dialogDatas;
-        public List<DialogueSet> ConvertToDialogueSet()
+        public List<DialogueSet> ConvertToDialogueSet(Dictionary<string,Sprite> Images)
         {
-            Dictionary<string, DialogueSet> dialogueFilter = GetDialogueSetByGroupID();
+            Dictionary<string, DialogueSet> dialogueFilter = GetDialogueSetByGroupID(Images);
             List <DialogueSet> result = new List<DialogueSet>();
             foreach (var obj in dialogueFilter)
             {
@@ -30,14 +32,21 @@ namespace Cameo
             }
             return result;
         }
-        public Dictionary<string, DialogueSet> GetDialogueSetByGroupID()
+        public Dictionary<string, DialogueSet> GetDialogueSetByGroupID(Dictionary<string,Sprite> Images)
         {
             Dictionary<string, DialogueSet> dialogueFilter = new Dictionary<string, DialogueSet>();
             foreach (var obj in dialogDatas)
             {
                 var oneDialogue = new DialogueActionUnit(obj.Dialogue);
                 oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
-
+                if(Images.ContainsKey(obj.BGImage))
+                {
+                    oneDialogue.BGImage = Images[obj.BGImage];
+                }
+                if(Images.ContainsKey(obj.CenterImage))
+                {
+                    oneDialogue.CenterImg = Images[obj.CenterImage];
+                }
                 if (dialogueFilter.ContainsKey(obj.GroupID))
                 {
                     dialogueFilter[obj.GroupID].AdvanceDialogues.Add(oneDialogue);
@@ -63,8 +72,8 @@ namespace Cameo
                         FastAPISettings.SpreadSheetKey, SpreadSheet,
                         FastAPISettings.WorkSheetKey, WorkSheet);
                 string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
-                Debug.Log("下載對白資料成功");
-                Debug.Log(jsonStr);
+                //Debug.Log("下載對白資料成功");
+                //Debug.Log(jsonStr);
                 dialogDatas = JsonConvert.DeserializeObject<List<DialogData>>(jsonStr);
 
             }
@@ -92,7 +101,21 @@ namespace Cameo
         {
             Setup(SpreadSheetName, WorksheetName);
             yield return dialogueDownloadSets.loadDataSets(SpreadSheetName, WorksheetName, UserAccount, Token).AsIEnumerator();
-            DialogueSets = dialogueDownloadSets.GetDialogueSetByGroupID();
+            ImageDownloadHelper imageDownloadHelper = new ImageDownloadHelper();
+            List<string> imageURL = new List<string>();
+            foreach (var obj in dialogueDownloadSets.dialogDatas)
+            {
+                if (!string.IsNullOrEmpty(obj.BGImage))
+                {
+                    imageURL.Add(obj.BGImage);
+                }
+                if (!string.IsNullOrEmpty(obj.CenterImage))
+                {
+                    imageURL.Add(obj.CenterImage);
+                }
+            }
+            yield return imageDownloadHelper.DownloadImages(imageURL);
+            DialogueSets = dialogueDownloadSets.GetDialogueSetByGroupID(imageDownloadHelper.LoadedImages);
         }
   
         public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd)
