@@ -22,14 +22,22 @@ namespace Cameo.UI
 
         public const string Parm_Msg = "Parm_Msg";
         public const string BOX_ID = "UI_ComfirmCloseBox";
-        public static void ShowBox(UI_ComfirmCloseBox prefab, UnityAction OnOk, UnityAction OnCancel = null, string text = "")
+        public static UI_ComfirmCloseBox ShowBox(UI_ComfirmCloseBox prefab, UnityAction OnOk, UnityAction OnCancel = null, string text = "")
         {
             Dictionary<string, object> param = new Dictionary<string, object>();
             param.Add(Parm_OK, OnOk);
             param.Add(Parm_Cancel, OnCancel);
             param.Add(Parm_Msg, text);
-            MessageBoxManager.Instance.ShowMessageBox(prefab, param);
+            return (UI_ComfirmCloseBox) MessageBoxManager.Instance.ShowMessageBox(prefab, param);
 
+        }
+        public void SetOKBTNEnable(bool enable)
+        {
+            comfirmBTN.interactable = enable;
+        }
+        public void SetMsg(string msg)
+        {
+            Message.text = msg;
         }
         protected override void onOpen()
         {
