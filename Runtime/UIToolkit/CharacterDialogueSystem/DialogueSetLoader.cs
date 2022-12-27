@@ -11,7 +11,7 @@ namespace Cameo
     public class DialogData
     {
         public string GroupID;
-        public int Index;
+        //public int Index;
         public string Dialogue;
         //public int RoleIndex;
         public string RoleName;
