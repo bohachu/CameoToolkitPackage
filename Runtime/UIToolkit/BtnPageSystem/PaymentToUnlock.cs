@@ -16,7 +16,7 @@ public class PaymentToUnlock : MonoBehaviour
     string MesLoading="讀取你的因才幣資料中...";
     [SerializeField]
     int UnLockFee=1;//解鎖關卡所需金額
-    UI_ComfirmCloseBox box;
+    protected UI_ComfirmCloseBox box;
     string msgEnough
     {
         get

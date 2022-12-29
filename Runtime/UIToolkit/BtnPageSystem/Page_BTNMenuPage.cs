@@ -215,6 +215,8 @@ public class Page_BTNMenuPage : BasePage
     protected List<BTNUISet> buttons;
     [SerializeField]
     protected UI_BTNLancherBase DefaultLancher;
+    [SerializeField]
+    PaymentToUnlock paymentBox;
     public const string Param_PageID = "Param_PageID";
     public const string Param_Title = "Param_Title";
     private void onSwitch(string pageID)
@@ -239,7 +241,6 @@ public class Page_BTNMenuPage : BasePage
                 obj.UnLockBtn.onClick.RemoveAllListeners();
                 obj.UnLockBtn.onClick.AddListener(() =>
                 {
-                    PaymentToUnlock paymentBox = FindObjectOfType<PaymentToUnlock>();
                     if(paymentBox==null)
                     {
                         Debug.LogError("找不到payment box");

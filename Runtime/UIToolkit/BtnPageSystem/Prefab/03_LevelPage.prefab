@@ -1004,6 +1004,7 @@ MonoBehaviour:
     NormImg: {fileID: 21300000, guid: 645d506f18c194084bcba04ef4f438ba, type: 3}
     PageID: 
   DefaultLancher: {fileID: 0}
+  paymentBox: {fileID: 4166892431858794553}
   MapUI: {fileID: 9109505019341118754}
   ExtraUrlBTN:
   - {fileID: 2592963706517028062}
