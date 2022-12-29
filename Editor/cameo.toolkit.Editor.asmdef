@@ -1,7 +1,10 @@
 {
     "name": "cameo.toolkit.Editor",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:b80f7329af7a9427f94d829958bb8eff",
+        "GUID:69448af7b92c7f342b298e06a37122aa"
+    ],
     "includePlatforms": [
         "Editor"
     ],

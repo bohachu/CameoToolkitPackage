@@ -118,13 +118,13 @@ namespace Cameo
         ActionFail,
         TakePhoto,
         Scanning,
-        NewPlayerButton,
+        NewPlayerButton,//和action一樣可以用CommunUIButton
 
         Purchase,
 
-        PurchaseItemCountChange,
+      //  PurchaseItemCountChange,//MissionStart 一樣 
 
-        PlantAction,
+      //  PlantAction,//和action一樣可以用CommunUIButton
 
         CastSkill,
 
@@ -135,7 +135,7 @@ namespace Cameo
 
         GetGift,
 
-        ItemCollect,
+      //  ItemCollect,//MissionStart 一樣
         PageScroll,
 
         Portal,
