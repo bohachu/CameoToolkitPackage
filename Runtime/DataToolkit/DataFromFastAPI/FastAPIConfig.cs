@@ -74,7 +74,7 @@ namespace Cameo
             FastAPISettings.DataIndexSpreadSheet = urlDefine.FileIndex;
             FastAPISettings.key_value_get = urlDefine.GetkeyUrl;
             FastAPISettings.key_value_set = urlDefine.SetkeyUrl;
-            //FastAPISettings.LoginPageUrl = urlDefine.GameDataUrl;
+            FastAPISettings.GameDataUrl = urlDefine.GameDataUrl;
 
         }
     }
@@ -84,6 +84,7 @@ namespace Cameo
         public static string BaseAPIUrl = "https://plant-hero.cameo.tw";
         //引導玩家登入的Url
         public static string LoginPageUrl = "https://adl.edu.tw/HomePage/login/?sys=planting";
+        public static string GameDataUrl = "";
 
         //fapi
         public static string BaseFapi { get { return BaseAPIUrl + "/fapi/"; } }
