@@ -21,11 +21,11 @@ namespace Cameo
 
         private const string EXT = "asset";
 
-        private static string SettingFilePathInAsset
+       private static string SettingFilePathInAsset
         {
             get
             {
-                return Path.Combine("Assets/Cameo/ResourceManager/Resources", SettingRelativePath + "." + EXT);
+                return Path.Combine("Assets/Resources", SettingRelativePath + "." + EXT);
             }
         }
 
@@ -33,9 +33,10 @@ namespace Cameo
         {
             get
             {
-                return Path.Combine(Application.dataPath, "Resources", "AddressableTool");
+                return Path.Combine("Assets/Resources", "AddressableTool");
             }
         }
+
 
         private static AddressableToolSetting setting;
 
