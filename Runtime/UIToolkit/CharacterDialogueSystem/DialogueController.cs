@@ -124,6 +124,9 @@ public class DialogueSet
     }
 }
 
+public class OnDialogueShowEvent : UnityEvent<DialogueActionUnit> { }
+
+
 public class DialogueController : MonoBehaviour
 {
     private static DialogueController instance;
@@ -157,6 +160,7 @@ public class DialogueController : MonoBehaviour
             return currentDialogue;
         }
     }
+    public OnDialogueShowEvent _OnDialogueShowEvent;
     public Text DialogueText;
     public Button dialogueBTN;
     public Image BGImage;
@@ -489,6 +493,7 @@ public class DialogueController : MonoBehaviour
     bool ShowNextDialogue(List<DialogueActionUnit> text, Action action, BTNType finalBTN)
     {
         currentDialogue = text[multiDialogueIndex];
+        _OnDialogueShowEvent.Invoke(currentDialogue);
         ShowTextAndAction(currentDialogue);
         if (multiDialogueIndex == (text.Count - 1))
         {   //Debug.Log("最後一句話");
