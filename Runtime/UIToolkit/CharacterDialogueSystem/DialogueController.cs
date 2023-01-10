@@ -124,6 +124,7 @@ public class DialogueSet
     }
 }
 
+[System.Serializable]
 public class OnDialogueShowEvent : UnityEvent<DialogueActionUnit> { }
 
 
