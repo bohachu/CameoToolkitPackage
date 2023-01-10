@@ -9,6 +9,7 @@ using Cameo;
 [System.Serializable]
 public class DialogueActionUnit
 {
+    public DialogData originData; // for debug or plugin use
     public string Dialogue;
     public DialogueController.CharacterExpression characterExpression = DialogueController.CharacterExpression.Default;
 
@@ -32,16 +33,19 @@ public class DialogueActionUnit
         Dialogue = "";
         Action = new UnityEvent();
     }
-    public DialogueActionUnit(string text)
+    
+    public DialogueActionUnit(DialogData data)
     {
-        Dialogue = text;
+        Dialogue = data.Dialogue;
         Action = new UnityEvent();
+        originData = data;
     }
 }
 [System.Serializable]
 public class DialogueSet
 {
     public List<DialogueActionUnit> AdvanceDialogues;
+   
     public DialogueSet()
     {
         AdvanceDialogues = new List<DialogueActionUnit>();
@@ -143,6 +147,14 @@ public class DialogueController : MonoBehaviour
         get
         {
             return multiDialogueIndex;
+        }
+    }
+     DialogueActionUnit currentDialogue;
+    public DialogueActionUnit CurrentDialogue
+    {
+        get
+        {
+            return currentDialogue;
         }
     }
     public Text DialogueText;
@@ -434,26 +446,21 @@ public class DialogueController : MonoBehaviour
         DialogueText.text = replacePlayerName(dialogueActionUnit.Dialogue);
         if(dialogueActionUnit.IsBGChange)
         {
-            
             BGImage.sprite = dialogueActionUnit.BGImage;
 
             if (dialogueActionUnit.BGImage != null)
             {
                 BGImage.gameObject.SetActive(true);
                 BGImage.color = Color.white;
-
             }
             else
             {
                 BGImage.gameObject.SetActive(false);
                 BGImage.color = new Color(1,1,1,0);
             }
-
-           
         }
         if (dialogueActionUnit.IsCenterImgChange)
         {
-            
             CenterImage.sprite = dialogueActionUnit.CenterImg;
             CenterImage.color = Color.white;
             if (dialogueActionUnit.CenterImg != null)
@@ -481,9 +488,11 @@ public class DialogueController : MonoBehaviour
     }
     bool ShowNextDialogue(List<DialogueActionUnit> text, Action action, BTNType finalBTN)
     {
+        currentDialogue = text[multiDialogueIndex];
+        ShowTextAndAction(currentDialogue);
         if (multiDialogueIndex == (text.Count - 1))
         {   //Debug.Log("最後一句話");
-            ShowTextAndAction(text[multiDialogueIndex]);
+            
             multiDialogueIndex = 0;
            // Debug.Log("ShowNextDialogue" + action);
             if (action != null)
@@ -502,7 +511,6 @@ public class DialogueController : MonoBehaviour
         }
         else
         {
-            ShowTextAndAction(text[multiDialogueIndex]);
             multiDialogueIndex++;
             //Debug.Log("還有下一句對話，顯示BTN");
             ShowBTN(delegate {

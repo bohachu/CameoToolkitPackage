@@ -17,6 +17,10 @@ namespace Cameo
         public string RoleName;
         public string BGImage;
         public string CenterImage;
+
+        public string Audio; // audio file name or url
+
+        public string ExtraParam; // josn format string for non standard data
     }
     [System.Serializable]
     public class DialogueDataSet
@@ -43,7 +47,7 @@ namespace Cameo
             Dictionary<string, DialogueSet> dialogueFilter = new Dictionary<string, DialogueSet>();
             foreach (var obj in dialogDatas)
             {
-                var oneDialogue = new DialogueActionUnit(obj.Dialogue);
+                var oneDialogue = new DialogueActionUnit(obj);
                 oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
                 if(obj.BGImage == PresetImageCommand.Hide.ToString())
                 {
