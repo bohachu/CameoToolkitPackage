@@ -213,6 +213,7 @@ public class DialogueController : MonoBehaviour
     [System.Serializable]
     public class CharacterSet
     {
+        public string CharacterID;
         public string CharacterName;
         public Sprite CharacterImg;
     }
@@ -333,12 +334,12 @@ public class DialogueController : MonoBehaviour
 
     }
     private CharacterExpression preExpression;
-    public int GetExpressionIndexByName(string name)
+    public int GetExpressionIndexByName(string roleID)
     {
         int ind = 0;
         foreach(var obj in CharacterSets)
         {
-            if (obj.CharacterName == name)
+            if (obj.CharacterID == roleID)
                 return ind;
             ind++;
         }

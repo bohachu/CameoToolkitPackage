@@ -15,6 +15,7 @@ namespace Cameo
         public string Dialogue;
         //public int RoleIndex;
         public string RoleName;
+        public string RoleID;
         public string BGImage;
         public string CenterImage;
 
@@ -48,7 +49,7 @@ namespace Cameo
             foreach (var obj in dialogDatas)
             {
                 var oneDialogue = new DialogueActionUnit(obj);
-                oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
+                oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleID);
                 if(obj.BGImage == PresetImageCommand.Hide.ToString())
                 {
                     oneDialogue.BGImage = null;
