@@ -343,7 +343,7 @@ public class DialogueController : MonoBehaviour
                 return ind;
             ind++;
         }
-        if (name == "玩家") return (int)CharacterExpression.Player;
+        if (roleID == PlayerSet.CharacterID) return (int)CharacterExpression.Player;
         Debug.LogError("對話expression中找不到對應的角色名稱，確認dialog controller："+roleID);
         return 0;
     }
