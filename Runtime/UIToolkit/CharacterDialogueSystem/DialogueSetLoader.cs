@@ -14,8 +14,8 @@ namespace Cameo
         //public int Index;
         public string Dialogue;
         //public int RoleIndex;
-        public string RoleName;
-        public string RoleID;
+        public string RoleName; // 其實是角色ID不是name, 但是歷史因素，這邊沒有改
+
         public string BGImage;
         public string CenterImage;
 
@@ -49,7 +49,7 @@ namespace Cameo
             foreach (var obj in dialogDatas)
             {
                 var oneDialogue = new DialogueActionUnit(obj);
-                oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleID);
+                oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
                 if(obj.BGImage == PresetImageCommand.Hide.ToString())
                 {
                     oneDialogue.BGImage = null;
