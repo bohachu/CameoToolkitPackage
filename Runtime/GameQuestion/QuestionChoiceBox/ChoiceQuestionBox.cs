@@ -1,0 +1,316 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Cameo.UI;
+using UnityEngine.UI;
+using Cameo;
+
+using UnityEngine.Events;
+
+//多選題基礎類別    
+
+namespace Cameo.QuestionGame
+{
+    [System.Serializable]
+    public partial class QuestionEntity
+    {
+        public string questionID;
+        public string question;
+        public string questionAudioUrl;
+        public Sprite questionImage;
+        public List<string> choices; //文字選項
+        public List<Sprite> choiceImages; //圖片選項
+
+        public int ChoiceCount
+        {
+            get
+            {
+                if (choices != null)
+                    return choices.Count;
+                else if (choiceImages != null)
+                    return choiceImages.Count;
+                else
+                    return 0;
+            }
+        }
+        public List<int> answer;
+        public string Reason; //原因
+        public string Remark;//備注，例如出處
+        public UnityAction<string> OnSuccess;
+        public UnityAction OnFail;
+        public UnityAction OnCancel;
+        public UnityAction OnClose;
+        public UnityAction<int> OnAnserDone;
+        public UnityAction OnTimeUp;
+    }
+    [System.Serializable]
+    public partial class ChoiceBTNSet
+    {
+        [HideInInspector]
+        public int index;
+        public Image image; //選項圖片
+        public Text text; //選項文字
+        public Button ChoiceBTN;//選項按鈕
+        [SerializeField]
+        Color correctColor = new Color(47 / 255f, 84 / 255f, 85 / 255f);
+        [SerializeField]
+        Color wrongColor = new Color(189 / 255f, 72 / 255f, 61 / 255f);
+        [SerializeField]
+        Color selectColor = Color.white;
+        public void SetActive(bool active)
+        {
+            if (text != null)
+                text.gameObject.SetActive(active);
+            if (image != null)
+                image.gameObject.SetActive(active);
+            if (ChoiceBTN != null)
+                ChoiceBTN.gameObject.SetActive(active);
+        }
+        List<int> answers;
+        UnityAction OnCorrect;
+        UnityAction OnWrong;
+        public void Init(int index, QuestionEntity questionEntity , UnityAction OnCorrect, UnityAction OnWrong)
+        {
+            this.index = index;
+            if(this.text != null)
+                this.text.text = questionEntity.choices[index];
+            if(this.image != null)
+                this.image.sprite = questionEntity.choiceImages[index];
+            this.answers = questionEntity.answer;
+            this.OnCorrect = OnCorrect;
+            this.OnWrong = OnWrong;
+            ChoiceBTN.onClick.AddListener(
+              ()=>{
+                OnClick(answers, OnCorrect, OnWrong);
+              } 
+            );
+        }
+        public void OnClick(List<int> Answers, UnityAction OnCorrect, UnityAction OnWrong)
+        {
+            //選取的按鈕改變outline顏色
+            if(isCorrect(Answers))
+            {
+                ChoiceBTN.image.color = correctColor;
+                OnCorrect.Invoke();
+            }
+            else
+            {
+                ChoiceBTN.image.color = wrongColor;
+                text.color = selectColor;
+                OnWrong.Invoke();
+            }
+        }
+        bool isCorrect(List<int> Answers)
+        {
+            return Answers.Contains(index);
+        }
+    }
+    public class ChoiceQuestionBox : BaseMessageBox
+    {
+        public static BaseMessageBox ShowBox(ChoiceQuestionBox prefab, QuestionEntity question)
+        {
+            Dictionary<string, object> param = new Dictionary<string, object>();
+            param.Add("QuestionEntity", question);
+            return MessageBoxManager.Instance.ShowMessageBox(prefab, param);
+        }
+        [HideInInspector]
+        public QuestionEntity questionEntity;
+        [SerializeField]
+        protected Text questionText;
+        [SerializeField]
+        protected Image questionImage;
+        [SerializeField]
+        protected Text ReasonText;
+        [SerializeField]
+        protected Button closeButton;
+        [SerializeField]
+        protected TimerCountdown timer;
+
+        [SerializeField]
+        public List<ChoiceBTNSet> optionsUIs;
+
+        [SerializeField]
+        int TimmerDuration = 60;
+        [SerializeField]
+        protected bool isAutoCloseBox = true; //是否在答題完成兩秒後自動關閉視窗
+        float startTime;
+        bool isAnserCorrect = false;
+        bool isAnsered=false;
+
+        public int workingTime
+        {
+            get;
+            set;
+        }
+        public UnityEvent OnCorrect;
+        public UnityEvent OnClosed;
+        public UnityEvent OnAnswered;
+        public UnityEvent OnStartSetting;
+    
+        protected virtual void onStartSetting() { }
+
+        protected override void onOpen()
+        {
+            if (paramMapping != null)
+            {
+                questionEntity = paramMapping["QuestionData"] as QuestionEntity;
+                setQuestion();
+            }
+
+            closeButton.onClick.AddListener(() =>
+            {
+                isCancelGame = true;
+                this.Close();
+            });
+
+            closeButton.gameObject.SetActive(false);
+            if (ReasonText != null)
+                ReasonText.gameObject.SetActive(false);
+            if (timer != null)
+                timer.StartTimmer(TimmerDuration, onTimeUp);
+            onStartSetting();
+            OnStartSetting.Invoke();
+            isAnsered=false;
+            startTime = Time.time;
+        }
+
+        protected virtual void setQuestion()
+        {
+            if(questionText!=null)
+                questionText.text = questionEntity.question;
+            if(questionImage!=null && questionEntity.questionImage!=null)
+                questionImage.sprite = questionEntity.questionImage;
+            int OptionCount = questionEntity.ChoiceCount;
+            for (int i = 0; i < OptionCount; i++)
+            {
+                if(optionsUIs.Count<=i)
+                {
+                    Debug.LogError("選項數量不足");
+                    break;
+                }
+                optionsUIs[i].Init(i, questionEntity, onAnserCorrect, onAnserWrong);
+            }
+            //隱藏多餘的選項
+            if(OptionCount<optionsUIs.Count)
+            {
+                for (int i = OptionCount; i < optionsUIs.Count; i++)
+                {
+                    optionsUIs[i].SetActive(false);
+                }
+            }
+            if(ReasonText!=null)
+            {
+                ReasonText.text = questionEntity.Reason;
+            }
+        }
+        void onAnserCorrect()
+        {  
+            isAnserCorrect = true;
+            onAnswered();
+            SystemAudioCenter.Instance.PlayOneShot(AudioClipType.ActionSuccess);
+             OnCorrect.Invoke();
+        }
+        void onAnserWrong()
+        {  
+            isAnserCorrect = false;
+            onAnswered();
+            SystemAudioCenter.Instance.PlayOneShot(AudioClipType.ActionFail);
+           
+        }
+        void onAnswered()
+        {
+            isAnsered=true;
+            CountTotalTime();
+
+            //顯示答案
+             if (ReasonText != null)
+                    ReasonText.gameObject.SetActive(true);
+
+            //先取消自動關閉，等待玩家按下關閉按鈕
+            closeButton.gameObject.SetActive(true);
+            StartCoroutine(WaitTimeClose(2));
+            OnAnswered.Invoke();
+        }
+        // 當倒數計時器時間到了以後的行為
+        protected virtual void onTimeUp()
+        {
+            isTimeUp = true;
+            CountTotalTime();
+        }
+
+        void CountTotalTime()
+        {
+            workingTime = Mathf.CeilToInt(Time.time - startTime);
+            if (timer != null)
+                    timer.StopCount();
+        }
+        // 橡皮擦作用
+        public void RandomRemoveOption()
+        {
+            // random remove one option in optionUIs
+            List<int> optionNumList = new List<int>();
+            for (int i = 0; i < questionEntity.choices.Count; i++)
+            {
+                optionNumList.Add(i);
+            }
+            for(int i = 0; i < questionEntity.answer.Count; i++)
+            {
+                optionNumList.Remove(questionEntity.answer[i]);
+            }
+            
+            int randomNum = Random.Range(0, optionNumList.Count);
+            optionsUIs[randomNum].SetActive(false);
+        }
+
+        // 蝸牛作用
+        public void ResetTimer()
+        {
+            if (timer != null)
+                timer.ResetTime(TimmerDuration);
+        }
+
+        bool isCancelGame = false;
+        bool isTimeUp = false;
+        public void CloseWithoutAnyAction()
+        {
+            questionEntity.OnClose=null;
+            isAnsered=false;
+            isTimeUp=false;
+            isCancelGame=false;
+            this.Close();
+        }
+        protected override void onClose()
+        {
+            OnClosed.Invoke();
+            if (isTimeUp)
+            {
+                questionEntity.OnTimeUp!.Invoke(); 
+                return;
+            }
+            if (isCancelGame)
+            {
+                questionEntity.OnCancel!.Invoke();
+                return;
+            }
+            if(isAnsered)
+                if (isAnserCorrect) questionEntity.OnSuccess.Invoke("QuestionID:" + questionEntity.questionID);
+                else questionEntity.OnFail!.Invoke();
+            if (questionEntity.OnClose != null)
+                    questionEntity.OnClose.Invoke();
+            base.onClose();
+        }
+        
+        IEnumerator WaitTimeClose(int timeSeconds)
+        {
+            if (isAutoCloseBox)
+            {
+                yield return new WaitForSeconds(timeSeconds);
+                this.Close();
+            }
+            else
+            {
+                yield return null;
+            }
+        }
+    }
+}
