@@ -14,26 +14,27 @@ namespace Cameo.QuestionGame
     [System.Serializable]
     public partial class QuestionEntity
     {
-        public string questionID;
-        public string question;
-        public string questionAudioUrl;
-        public Sprite questionImage;
-        public List<string> choices; //文字選項
-        public List<Sprite> choiceImages; //圖片選項
+        public string QuestionID;
+        public string QuestionBoxType;
+        public string Question;
+        public string QuestionAudioUrl;
+        public Sprite QuestionImage;
+        public List<string> Choices; //文字選項
+        public List<Sprite> ChoiceImages; //圖片選項
 
         public int ChoiceCount
         {
             get
             {
-                if (choices != null)
-                    return choices.Count;
-                else if (choiceImages != null)
-                    return choiceImages.Count;
+                if (Choices != null)
+                    return Choices.Count;
+                else if (ChoiceImages != null)
+                    return ChoiceImages.Count;
                 else
                     return 0;
             }
         }
-        public List<int> answer;
+        public List<int> Answer;
         public string Reason; //原因
         public string Remark;//備注，例如出處
         public UnityAction<string> OnSuccess;
@@ -73,10 +74,10 @@ namespace Cameo.QuestionGame
         {
             this.index = index;
             if(this.text != null)
-                this.text.text = questionEntity.choices[index];
+                this.text.text = questionEntity.Choices[index];
             if(this.image != null)
-                this.image.sprite = questionEntity.choiceImages[index];
-            this.answers = questionEntity.answer;
+                this.image.sprite = questionEntity.ChoiceImages[index];
+            this.answers = questionEntity.Answer;
             this.OnCorrect = OnCorrect;
             this.OnWrong = OnWrong;
             ChoiceBTN.onClick.AddListener(
@@ -177,9 +178,9 @@ namespace Cameo.QuestionGame
         protected virtual void setQuestion()
         {
             if(questionText!=null)
-                questionText.text = questionEntity.question;
-            if(questionImage!=null && questionEntity.questionImage!=null)
-                questionImage.sprite = questionEntity.questionImage;
+                questionText.text = questionEntity.Question;
+            if(questionImage!=null && questionEntity.QuestionImage!=null)
+                questionImage.sprite = questionEntity.QuestionImage;
             int OptionCount = questionEntity.ChoiceCount;
             for (int i = 0; i < OptionCount; i++)
             {
@@ -249,13 +250,13 @@ namespace Cameo.QuestionGame
         {
             // random remove one option in optionUIs
             List<int> optionNumList = new List<int>();
-            for (int i = 0; i < questionEntity.choices.Count; i++)
+            for (int i = 0; i < questionEntity.Choices.Count; i++)
             {
                 optionNumList.Add(i);
             }
-            for(int i = 0; i < questionEntity.answer.Count; i++)
+            for(int i = 0; i < questionEntity.Answer.Count; i++)
             {
-                optionNumList.Remove(questionEntity.answer[i]);
+                optionNumList.Remove(questionEntity.Answer[i]);
             }
             
             int randomNum = Random.Range(0, optionNumList.Count);
@@ -293,7 +294,7 @@ namespace Cameo.QuestionGame
                 return;
             }
             if(isAnsered)
-                if (isAnserCorrect) questionEntity.OnSuccess.Invoke("QuestionID:" + questionEntity.questionID);
+                if (isAnserCorrect) questionEntity.OnSuccess.Invoke("QuestionID:" + questionEntity.QuestionID);
                 else questionEntity.OnFail!.Invoke();
             if (questionEntity.OnClose != null)
                     questionEntity.OnClose.Invoke();
