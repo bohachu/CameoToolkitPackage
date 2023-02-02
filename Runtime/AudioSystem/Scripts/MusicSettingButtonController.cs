@@ -32,7 +32,7 @@ namespace Cameo
             }
             else
             {
-                isMute = true;
+                isMute = false; //預設開啟
             }
 
             setAudio();
