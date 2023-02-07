@@ -39,6 +39,20 @@ namespace Cameo.UI
         {
             Message.text = msg;
         }
+        bool isOK;
+        protected override void onClosed()
+        {
+           
+            if(isOK)
+            {
+                 OnOK.Invoke();
+            }
+            else
+            {
+                if(OnCancel!=null)
+                    OnCancel.Invoke();
+            }
+        }
         protected override void onOpen()
         {
             string msg = (string)paramMapping[Parm_Msg];
@@ -49,14 +63,16 @@ namespace Cameo.UI
             comfirmBTN.onClick.RemoveAllListeners();
             comfirmBTN.onClick.AddListener(
                 () => {
-                    OnOK.Invoke();
+                    //OnOK.Invoke();
+                    isOK=true;
                     Close();
                 });
             cancelBTN.onClick.RemoveAllListeners();
             cancelBTN.onClick.AddListener(
                 () => {
-                    if(OnCancel!=null)
-                        OnCancel.Invoke();
+                    //if(OnCancel!=null)
+                    //    OnCancel.Invoke();
+                    isOK=false;
                     Close();
                 });
         }

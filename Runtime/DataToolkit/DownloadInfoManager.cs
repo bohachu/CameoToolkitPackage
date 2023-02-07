@@ -48,7 +48,7 @@ namespace Cameo
             newinfo.ID = (string)jsonData["ID"];
             newinfo.SpreadSheet = (string)jsonData["SpreadSheet"];
             newinfo.WorkSheet = (string)jsonData["WorkSheet"];
-            newinfo.StartRow = (int)jsonData["StartRow"];
+            newinfo.StartRow = int.Parse((string)jsonData["StartRow"]);
             return newinfo;
         }
 
