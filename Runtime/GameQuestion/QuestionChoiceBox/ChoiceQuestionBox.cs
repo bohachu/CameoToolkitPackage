@@ -283,25 +283,31 @@ namespace Cameo.QuestionGame
             isCancelGame=false;
             this.Close();
         }
-        protected override void onClose()
+        protected override void onClosed()
         {
+            base.onClosed();
             OnClosed.Invoke();
+            
             if (isTimeUp)
             {
-                questionEntity.OnTimeUp!.Invoke(); 
+                if(questionEntity.OnTimeUp!=null)
+                    questionEntity.OnTimeUp.Invoke(); 
                 return;
             }
             if (isCancelGame)
             {
-                questionEntity.OnCancel!.Invoke();
+                if(questionEntity.OnCancel!=null)
+                    questionEntity.OnCancel.Invoke();
                 return;
             }
             if(isAnsered)
-                if (isAnserCorrect) questionEntity.OnSuccess.Invoke("QuestionID:" + questionEntity.QuestionID);
-                else questionEntity.OnFail!.Invoke();
+                if (isAnserCorrect)
+                    questionEntity.OnSuccess.Invoke("QuestionID:" + questionEntity.QuestionID);
+                else
+                if(questionEntity.OnFail!=null) 
+                    questionEntity.OnFail!.Invoke();
             if (questionEntity.OnClose != null)
                     questionEntity.OnClose.Invoke();
-            base.onClose();
         }
         
         IEnumerator WaitTimeClose(int timeSeconds)
