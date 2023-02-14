@@ -221,7 +221,7 @@ namespace Cameo
             {
                 //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
 
-                string[][] data = JsonMapper.ToObject<string[][]>(www.downloadHandler.text);
+                string[][] data =JsonConvert.DeserializeObject<string[][]>(www.downloadHandler.text);// JsonMapper.ToObject<string[][]>(www.downloadHandler.text);
                 
                 returnArray = new T[data.Length - index];
 
@@ -258,9 +258,9 @@ namespace Cameo
             requestBody[FastAPISettings.AccountKey] = UserAccount; 
             requestBody[FastAPISettings.TokenKey] = Token;
             requestBody[FastAPISettings.FileKey] = fileName;
-            requestBody[FastAPISettings.ContentKey] = JsonMapper.ToJson(data);
+            requestBody[FastAPISettings.ContentKey] = JsonConvert.SerializeObject(data);// JsonMapper.ToJson(data);
 
-            string jsonStr = JsonMapper.ToJson(requestBody);
+            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody);
 
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
 
@@ -298,7 +298,7 @@ namespace Cameo
             requestBody[FastAPISettings.ReadMessageListKey] = readedMessageIDs;
             requestBody[FastAPISettings.UnreadMessageListKey] = unreadedMessageIDs;
 
-            string jsonStr = JsonMapper.ToJson(requestBody);
+            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody);
 
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
 
@@ -326,37 +326,36 @@ namespace Cameo
 
         public async Task<string> UploadLog(string logTable, string logs, string UserAccount, string Token)
         {
-            UnityWebRequest www = new UnityWebRequest(FastAPISettings.LogUploadUrl, "POST");
-
-            Dictionary<string, object> requestBody = new Dictionary<string, object>();
-            requestBody[FastAPISettings.AccountKey] = UserAccount;
-            requestBody[FastAPISettings.TokenKey] = Token;
-            requestBody[FastAPISettings.TableKey] = logTable;
-            requestBody[FastAPISettings.LogKey] = logs;
-
-            string jsonStr = JsonMapper.ToJson(requestBody);
-
-            //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
-            var jsonRaw = System.Text.Encoding.UTF8.GetBytes(jsonStr);
-            www.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonRaw);
-            www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
-            www.disposeUploadHandlerOnDispose = true;
-            www.disposeDownloadHandlerOnDispose = true;
-            await www.SendWebRequest();
-            jsonRaw = null;
-            GC.Collect();
-            if (www.result == UnityWebRequest.Result.ConnectionError)
+            using(UnityWebRequest www = new UnityWebRequest(FastAPISettings.LogUploadUrl, "POST"))
             {
-                Debug.Log("Error While Sending: " + www.error);
-                var outData = www.error;
-                www.Dispose();
-                return outData;
-            }
-            else
-            {
-                //Debug.Log("Received: " + www.downloadHandler.text);
-                return "";
+                Dictionary<string, object> requestBody = new Dictionary<string, object>();
+                requestBody[FastAPISettings.AccountKey] = UserAccount;
+                requestBody[FastAPISettings.TokenKey] = Token;
+                requestBody[FastAPISettings.TableKey] = logTable;
+                requestBody[FastAPISettings.LogKey] = logs;
+
+                string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
+
+                //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
+                www.uploadHandler = (UploadHandler)new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonStr));
+                www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+                www.SetRequestHeader("Content-Type", "application/json");
+                www.disposeUploadHandlerOnDispose = true;
+                www.disposeDownloadHandlerOnDispose = true;
+                await www.SendWebRequest();
+                GC.Collect();
+                if (www.result == UnityWebRequest.Result.ConnectionError)
+                {
+                    Debug.Log("Error While Sending: " + www.error);
+                    var outData = www.error;
+                    www.Dispose();
+                    return outData;
+                }
+                else
+                {
+                    //Debug.Log("Received: " + www.downloadHandler.text);
+                    return "";
+                }
             }
         }
 
@@ -427,6 +426,7 @@ namespace Cameo
         /// <summary>
         /// 取得連續Json檔案
         /// </summary>
+         
         public async Task<T[]> LoadJsonList<T>(string[] paths, Func<JsonData, T> parser) where T:class
         {
             T[] returnArray = null;
@@ -438,7 +438,7 @@ namespace Cameo
             requestBody["action"] = "read-files-not-null";
             requestBody["paths"] = paths;
 
-            string jsonStr = JsonMapper.ToJson(requestBody, false);
+            string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody, false);
 
             Debug.Log(www.url);
             Debug.Log(jsonStr);
@@ -492,7 +492,7 @@ namespace Cameo
             requestBody["path"] = path;
             requestBody["columns"] = columns;
 
-            string jsonStr = JsonMapper.ToJson(requestBody, false);
+            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody, false);
 
             Debug.Log(www.url);
             Debug.Log(jsonStr);
@@ -548,7 +548,7 @@ namespace Cameo
             requestBody["columns"] = columns;
             requestBody["values"] = values;
 
-            string jsonStr = JsonMapper.ToJson(requestBody, false);
+            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody, false);
 
             Debug.Log(www.url);
             Debug.Log(jsonStr);

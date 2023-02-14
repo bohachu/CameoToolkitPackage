@@ -426,8 +426,12 @@ public class Page_BTNMenuPage : BasePage
             if (!string.IsNullOrEmpty(btnDatas[i].ImageName))
             {
                 Sprite normimg = ResourceManager.Instance.LoadAsset<Sprite>(btnDatas[i].ImageName);
+                 buttons[i].NormImg = normimg;
+            }
+            if (!string.IsNullOrEmpty(btnDatas[i].LockImageName))
+            {
                 Sprite lockimg = ResourceManager.Instance.LoadAsset<Sprite>(btnDatas[i].LockImageName);
-                buttons[i].SetupImage(normimg, lockimg);
+                buttons[i].LockImg = lockimg;
             }
         }
     }

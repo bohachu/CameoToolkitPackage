@@ -154,7 +154,7 @@ namespace Cameo.QuestionGame
         {
             if (paramMapping != null)
             {
-                questionEntity = paramMapping["QuestionData"] as QuestionEntity;
+                questionEntity = paramMapping["QuestionEntity"] as QuestionEntity;
                 setQuestion();
             }
 
