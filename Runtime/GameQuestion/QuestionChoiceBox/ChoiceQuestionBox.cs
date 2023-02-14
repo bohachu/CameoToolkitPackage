@@ -165,8 +165,10 @@ namespace Cameo.QuestionGame
             });
 
             closeButton.gameObject.SetActive(false);
+          
             if (ReasonText != null)
-                ReasonText.gameObject.SetActive(false);
+                ReasonText.transform.parent.gameObject.SetActive(false);
+                //ReasonText.gameObject.SetActive(false);
             if (timer != null)
                 timer.StartTimmer(TimmerDuration, onTimeUp);
             onStartSetting();
@@ -225,7 +227,8 @@ namespace Cameo.QuestionGame
 
             //顯示答案
              if (ReasonText != null)
-                    ReasonText.gameObject.SetActive(true);
+                ReasonText.transform.parent.gameObject.SetActive(true);
+                
 
             //先取消自動關閉，等待玩家按下關閉按鈕
             closeButton.gameObject.SetActive(true);
