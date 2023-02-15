@@ -26,12 +26,19 @@ namespace Cameo.QuestionGame
         {
             get
             {
+
                 if (Choices != null)
-                    return Choices.Count;
-                else if (ChoiceImages != null)
-                    return ChoiceImages.Count;
-                else
-                    return 0;
+                {
+                    if(Choices.Count>0)
+                        return Choices.Count;
+                }
+                if(ChoiceImages != null)
+                {
+                    if(ChoiceImages.Count>0)
+                        return ChoiceImages.Count;
+                } 
+                
+                return 0;
             }
         }
         public List<int> Answer;
@@ -74,9 +81,25 @@ namespace Cameo.QuestionGame
         {
             this.index = index;
             if(this.text != null)
-                this.text.text = questionEntity.Choices[index];
+            {
+                if(questionEntity.Choices.Count<=index)
+                {
+                    Debug.LogError("文字選項數量不足，請檢查上搞選項數量");
+                    return;
+                }
+                 this.text.text = questionEntity.Choices[index];
+            }
+               
             if(this.image != null)
+            {
+                if (questionEntity.ChoiceImages.Count <= index)
+                {
+                    Debug.LogError("圖片選項數量不足，請檢查上搞圖片數量與圖片是否可以下載");
+                    return;
+                }
                 this.image.sprite = questionEntity.ChoiceImages[index];
+            }
+                
             this.answers = questionEntity.Answer;
             this.OnCorrect = OnCorrect;
             this.OnWrong = OnWrong;
@@ -97,7 +120,8 @@ namespace Cameo.QuestionGame
             else
             {
                 ChoiceBTN.image.color = wrongColor;
-                text.color = selectColor;
+               if(text!=null)
+                    text.color = selectColor;
                 OnWrong.Invoke();
             }
         }
@@ -160,7 +184,8 @@ namespace Cameo.QuestionGame
 
             closeButton.onClick.AddListener(() =>
             {
-                isCancelGame = true;
+                //結束答題後，可以按下按鈕關閉視窗，不按，兩秒後也會自動關閉
+                StopCoroutine("WaitTimeClose");
                 this.Close();
             });
 
@@ -233,6 +258,7 @@ namespace Cameo.QuestionGame
             //先取消自動關閉，等待玩家按下關閉按鈕
             closeButton.gameObject.SetActive(true);
             StartCoroutine(WaitTimeClose(2));
+            
             OnAnswered.Invoke();
         }
         // 當倒數計時器時間到了以後的行為
