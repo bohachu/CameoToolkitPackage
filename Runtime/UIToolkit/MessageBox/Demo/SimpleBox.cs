@@ -20,7 +20,10 @@ public class SimpleBox : BaseMessageBox
         if(paramMapping != null)
         {
             textComp.text = paramMapping[MSG_ID].ToString();
-            actionClick = (UnityAction)paramMapping[OnOK_ID];
+             if(paramMapping.ContainsKey(OnOK_ID))
+                actionClick = (UnityAction)paramMapping[OnOK_ID];
+            else actionClick=null;
+              
         }
     }
 
@@ -28,14 +31,10 @@ public class SimpleBox : BaseMessageBox
     {
         if(actionClick!=null)
         {
-            Debug.Log("actionClick is click");
+            //Debug.Log("actionClick is click");
             actionClick.Invoke();
         }
-        else
-        {
-
-            Debug.Log("actionClick is null");
-        }
+        
         SystemAudioCenter.Instance.PlayOneShot(AudioClipType.CommonUIButton);
     }
 }

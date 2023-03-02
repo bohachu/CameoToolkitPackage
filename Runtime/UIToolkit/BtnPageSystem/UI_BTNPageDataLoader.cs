@@ -113,13 +113,17 @@ public class UI_BTNPageDataLoader : MonoBehaviour
         List<string> ImageAddres = new List<string>();
         foreach(var obj in data)
         {
-           if(!string.IsNullOrEmpty(obj.ImageName))
+           if(!string.IsNullOrWhiteSpace(obj.ImageName))
             {
                 ImageAddres.Add(obj.ImageName);
-                if(obj.ImageName!=obj.LockImageName)
-                    ImageAddres.Add(obj.LockImageName);
+                if(!string.IsNullOrWhiteSpace(obj.LockImageName))
+                {
+                    if(obj.ImageName!=obj.LockImageName)
+                        ImageAddres.Add(obj.LockImageName);
+                }
             }
-            if (!string.IsNullOrEmpty(obj.Background))
+            
+            if (!string.IsNullOrWhiteSpace(obj.Background))
             {
                 ImageAddres.Add(obj.Background);
             }
