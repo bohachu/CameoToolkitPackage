@@ -10,9 +10,9 @@ using System.Net;
 
 namespace Cameo
 {
-    public class FileRequestHelper :Singleton<FileRequestHelper>
+    public class FileRequestHelper : Singleton<FileRequestHelper>
     {
-       
+
         public async Task<T> LoadJson<T>(string url) where T : class
         {
             //Debug.Log("LoadJson: " + url);
@@ -38,22 +38,22 @@ namespace Cameo
                 {
                     return JsonConvert.DeserializeObject<T>(data); //JsonMapper.ToObject<T>(data);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Debug.LogFormat("Load {0} error: {1},{2}", url, data, e);
 
                     return null;
-                } 
+                }
             }
-           
+
         }
-       
+
         public async Task<T> LoadJson<T>(string url, Func<JsonData, T> parser) where T : class
         {
-            
-           //Debug.Log("LoadJson with parser: " + url);
 
-           UnityWebRequest www = new UnityWebRequest(url);
+            //Debug.Log("LoadJson with parser: " + url);
+
+            UnityWebRequest www = new UnityWebRequest(url);
 
             www.downloadHandler = new DownloadHandlerBuffer();
             www.disposeUploadHandlerOnDispose = true;
@@ -114,12 +114,13 @@ namespace Cameo
 
             if (www.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log(www.error);
+                Debug.Log(url);
+                Debug.LogError(www.error);
             }
             www.Dispose();
         }
 
-        public async Task<RequestResult> InvokeAPI<T>(string url, Func<JsonData, T> parser) where T:class
+        public async Task<RequestResult> InvokeAPI<T>(string url, Func<JsonData, T> parser) where T : class
         {
             //Debug.Log(url);
 
@@ -151,7 +152,7 @@ namespace Cameo
         }
 
         //以JsonObject Array方式載入sheet資料，(回傳資料包含Key名稱)
-        public async Task<T[]> LoadArray<T>(string spreadSheet, string workSheet, int index, Func<JsonData, T> parser, string userAccount,string token) where T : class
+        public async Task<T[]> LoadArray<T>(string spreadSheet, string workSheet, int index, Func<JsonData, T> parser, string userAccount, string token) where T : class
         {
             T[] returnArray = null;
 
@@ -204,7 +205,7 @@ namespace Cameo
                 FastAPISettings.SpreadSheetKey, spreadSheet,
                 FastAPISettings.WorkSheetKey, workSheet);
 
-          //  Debug.Log(url);
+            //  Debug.Log(url);
 
             UnityWebRequest www = new UnityWebRequest(url);
 
@@ -221,8 +222,8 @@ namespace Cameo
             {
                 //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
 
-                string[][] data =JsonConvert.DeserializeObject<string[][]>(www.downloadHandler.text);// JsonMapper.ToObject<string[][]>(www.downloadHandler.text);
-                
+                string[][] data = JsonConvert.DeserializeObject<string[][]>(www.downloadHandler.text);// JsonMapper.ToObject<string[][]>(www.downloadHandler.text);
+
                 returnArray = new T[data.Length - index];
 
                 for (int i = index; i < data.Length; i++)
@@ -255,12 +256,12 @@ namespace Cameo
             UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetRequestUrl, "POST");
 
             Dictionary<string, string> requestBody = new Dictionary<string, string>();
-            requestBody[FastAPISettings.AccountKey] = UserAccount; 
+            requestBody[FastAPISettings.AccountKey] = UserAccount;
             requestBody[FastAPISettings.TokenKey] = Token;
             requestBody[FastAPISettings.FileKey] = fileName;
             requestBody[FastAPISettings.ContentKey] = JsonConvert.SerializeObject(data);// JsonMapper.ToJson(data);
 
-            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody);
+            string jsonStr = JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody);
 
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
 
@@ -285,10 +286,10 @@ namespace Cameo
                 //Debug.Log("Received: " + www.downloadHandler.text);
                 return "";
             }
-            
+
         }
 
-        public async Task<string> UploadMessageData(List<string> readedMessageIDs, List<string> unreadedMessageIDs,string UserAccount, string Token)
+        public async Task<string> UploadMessageData(List<string> readedMessageIDs, List<string> unreadedMessageIDs, string UserAccount, string Token)
         {
             UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetMessageReadUrl, "POST");
 
@@ -298,7 +299,7 @@ namespace Cameo
             requestBody[FastAPISettings.ReadMessageListKey] = readedMessageIDs;
             requestBody[FastAPISettings.UnreadMessageListKey] = unreadedMessageIDs;
 
-            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody);
+            string jsonStr = JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody);
 
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
 
@@ -323,17 +324,17 @@ namespace Cameo
                 return "";
             }
         }
-        public static async Task<string> UploadRankScore(string gameName, string rankFileName,int score, string UserAccount, string Token)
+public static async Task<string> UploadRankScore(string url, string userAccount, string token, string gameName, string rankFileName, string userName, int score)
         {
-            using(UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetRankUrl, "POST"))
+            using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
             {
                 Dictionary<string, object> requestBody = new Dictionary<string, object>();
-                requestBody[FastAPISettings.AccountKey] = UserAccount;
-                requestBody[FastAPISettings.TokenKey] = Token;
+                requestBody[FastAPISettings.AccountKey] =userAccount;
+                requestBody[FastAPISettings.TokenKey] = token;
                 requestBody[FastAPISettings.GameName] = gameName;
-                requestBody[FastAPISettings.RankFile] = rankFileName;
-                requestBody[FastAPISettings.RankScore] = score;
-
+                     requestBody[FastAPISettings.RankFile] =rankFileName;
+                            requestBody["str_name"] = userName;
+                            requestBody[FastAPISettings.RankScore] = score;
                 string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
 
                 //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
@@ -345,22 +346,21 @@ namespace Cameo
                 await www.SendWebRequest();
                 if (www.result == UnityWebRequest.Result.ConnectionError)
                 {
-                    Debug.Log("Error While Sending RankScore: " + www.error);
+                    Debug.Log("Error While Sending: " + www.error);
                     var outData = www.error;
                     www.Dispose();
                     return outData;
                 }
                 else
                 {
-                    //Debug.Log("Received: " + www.downloadHandler.text);
-                    www.Dispose();
+                   // Debug.Log("Received: " + www.downloadHandler.text);
                     return "";
                 }
             }
         }
         public async Task<string> UploadLog(string logTable, string logs, string UserAccount, string Token)
         {
-            using(UnityWebRequest www = new UnityWebRequest(FastAPISettings.LogUploadUrl, "POST"))
+            using (UnityWebRequest www = new UnityWebRequest(FastAPISettings.LogUploadUrl, "POST"))
             {
                 Dictionary<string, object> requestBody = new Dictionary<string, object>();
                 requestBody[FastAPISettings.AccountKey] = UserAccount;
@@ -437,7 +437,7 @@ namespace Cameo
                 www.Dispose();
                 return null;
             }
-            else if(www.downloadHandler.text == "Not Found")
+            else if (www.downloadHandler.text == "Not Found")
             {
                 //Debug.Log("Download image " + www.downloadHandler.text);
                 www.Dispose();
@@ -460,8 +460,8 @@ namespace Cameo
         /// <summary>
         /// 取得連續Json檔案
         /// </summary>
-         
-        public async Task<T[]> LoadJsonList<T>(string[] paths, Func<JsonData, T> parser) where T:class
+
+        public async Task<T[]> LoadJsonList<T>(string[] paths, Func<JsonData, T> parser) where T : class
         {
             T[] returnArray = null;
 
@@ -497,7 +497,7 @@ namespace Cameo
             else
             {
                 //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
-                
+
                 JsonData jsonData = JsonMapper.ToObject(www.downloadHandler.text);
 
                 returnArray = new T[paths.Length];
@@ -514,7 +514,7 @@ namespace Cameo
         /// <summary>
         /// 取得不重複key資料的最後一筆
         /// </summary>
-        public async Task<T[]> LoadArrayGroupLast<T>(string path, string[] columns, Func<string[], T> parser) where T:class
+        public async Task<T[]> LoadArrayGroupLast<T>(string path, string[] columns, Func<string[], T> parser) where T : class
         {
             T[] returnArray = null;
 
@@ -526,7 +526,7 @@ namespace Cameo
             requestBody["path"] = path;
             requestBody["columns"] = columns;
 
-            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody, false);
+            string jsonStr = JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody, false);
 
             Debug.Log(www.url);
             Debug.Log(jsonStr);
@@ -582,7 +582,7 @@ namespace Cameo
             requestBody["columns"] = columns;
             requestBody["values"] = values;
 
-            string jsonStr =JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody, false);
+            string jsonStr = JsonConvert.SerializeObject(requestBody);// JsonMapper.ToJson(requestBody, false);
 
             Debug.Log(www.url);
             Debug.Log(jsonStr);

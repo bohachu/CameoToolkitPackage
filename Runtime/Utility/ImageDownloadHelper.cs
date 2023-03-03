@@ -11,6 +11,22 @@ public class ImageDownloadHelper
 {
     Texture2D imageTexture;
     public Dictionary<string, Sprite> LoadedImages;
+     public async Task<Sprite> DownloadImage(string imageURL)
+    {
+        if(LoadedImages==null)
+        {
+            LoadedImages = new Dictionary<string, Sprite>();
+        }
+        Sprite image = null;
+        if(LoadedImages.ContainsKey(imageURL))
+        {
+            return LoadedImages[imageURL];
+        }
+        image = await DownloadImageAsync(imageURL);
+        LoadedImages.Add(imageURL, image);
+        return image;
+    }
+
     public static async Task<Sprite> DownloadImageAsync(string imageURL)
     {
         if (string.IsNullOrEmpty(imageURL))
@@ -34,28 +50,7 @@ public class ImageDownloadHelper
         }
         return null;
     }
-
-    public static IEnumerator DownloadImage(string imageURL, Action<Sprite> OnComplete)
-    {
-        if(string.IsNullOrEmpty(imageURL))
-        {
-            Debug.LogError("影像檔案url為空");
-            yield break;
-        }
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageURL);
-        yield return www.SendWebRequest();
-
-        if (www.result != UnityWebRequest.Result.Success)
-        {
-            Debug.Log("http image下載url:"+imageURL);
-            Debug.LogError("下載影像檔案失敗："+www.error);
-        }
-        else
-        {
-            var loadedTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-            OnComplete(TextureToSprite(loadedTexture));
-        }
-    }
+    
     public static IEnumerator DownloadImages(List<string> imageURL,Action<List<Sprite>> OnComplete)
     {
         List<Sprite> sprites = new List<Sprite>();

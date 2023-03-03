@@ -110,7 +110,7 @@ namespace Cameo
         public const string RankScore=  "int_score";
         //下載排行榜資料
         public static string GetRankUrl { get { return BaseAPIUrl + "/rank/get_rank"; } }
-        public static string SetRankUrl { get { return BaseAPIUrl + "/rank/set_rank"; } }
+        public static string SetRankUrl { get { return BaseAPIUrl + "/rank/set_rank/"; } }
         //下載遊戲資料回傳List of string格式
         public static string BaseListUrl { get { return BaseAPIUrl + "/sheet/get_all_values"; } }
 
