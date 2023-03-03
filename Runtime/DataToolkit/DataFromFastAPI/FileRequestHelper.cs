@@ -323,7 +323,41 @@ namespace Cameo
                 return "";
             }
         }
+        public static async Task<string> UploadRankScore(string gameName, string rankFileName,int score, string UserAccount, string Token)
+        {
+            using(UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetRankUrl, "POST"))
+            {
+                Dictionary<string, object> requestBody = new Dictionary<string, object>();
+                requestBody[FastAPISettings.AccountKey] = UserAccount;
+                requestBody[FastAPISettings.TokenKey] = Token;
+                requestBody[FastAPISettings.GameName] = gameName;
+                requestBody[FastAPISettings.RankFile] = rankFileName;
+                requestBody[FastAPISettings.RankScore] = score;
 
+                string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
+
+                //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
+                www.uploadHandler = (UploadHandler)new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonStr));
+                www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+                www.SetRequestHeader("Content-Type", "application/json");
+                www.disposeUploadHandlerOnDispose = true;
+                www.disposeDownloadHandlerOnDispose = true;
+                await www.SendWebRequest();
+                if (www.result == UnityWebRequest.Result.ConnectionError)
+                {
+                    Debug.Log("Error While Sending RankScore: " + www.error);
+                    var outData = www.error;
+                    www.Dispose();
+                    return outData;
+                }
+                else
+                {
+                    //Debug.Log("Received: " + www.downloadHandler.text);
+                    www.Dispose();
+                    return "";
+                }
+            }
+        }
         public async Task<string> UploadLog(string logTable, string logs, string UserAccount, string Token)
         {
             using(UnityWebRequest www = new UnityWebRequest(FastAPISettings.LogUploadUrl, "POST"))

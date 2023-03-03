@@ -81,7 +81,7 @@ namespace Cameo
 
     public static class FastAPISettings
     {  //Api domain
-        public static string BaseAPIUrl = "https://plant-hero.cameo.tw";
+        public static string BaseAPIUrl = "https://falra-band.bowenchiu.repl.co";
         //引導玩家登入的Url
         public static string LoginPageUrl = "https://adl.edu.tw/HomePage/login/?sys=planting";
         public static string GameDataUrl = "";
@@ -98,12 +98,19 @@ namespace Cameo
         public const string LogKey = "str_log";
         public const string ReadMessageListKey = "lst_message_id_set_true";
         public const string UnreadMessageListKey = "lst_message_id_set_false";
+
         //檔案索引檔的下載設定
         public static string DataIndexSpreadSheet = "FileIndex";
         public const string DataIndexWorkSheet = "Index";
         public const string DataIndexWorkSheetDevelop = "IndexDevelop";
         public const int DataIndexStartRow = 0;
-
+        //排行榜key
+        public const string GameName = "str_game_name";
+        public const string RankFile =  "str_rank_file";
+        public const string RankScore=  "int_score";
+        //下載排行榜資料
+        public static string GetRankUrl { get { return BaseAPIUrl + "/rank/get_rank"; } }
+        public static string SetRankUrl { get { return BaseAPIUrl + "/rank/set_rank"; } }
         //下載遊戲資料回傳List of string格式
         public static string BaseListUrl { get { return BaseAPIUrl + "/sheet/get_all_values"; } }
 

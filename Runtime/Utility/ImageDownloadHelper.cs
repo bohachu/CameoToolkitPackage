@@ -3,13 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using System.Threading.Tasks;
 /// <summary>
-/// 以coroutine的方式下載影像檔案
+/// 以coroutine與task的方式下載影像檔案
 /// </summary>
 public class ImageDownloadHelper
 {
     Texture2D imageTexture;
     public Dictionary<string, Sprite> LoadedImages;
+    public static async Task<Sprite> DownloadImageAsync(string imageURL)
+    {
+        if (string.IsNullOrEmpty(imageURL))
+        {
+            Debug.LogError("影像檔案url為空");
+            return null;
+        }
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageURL);
+        await www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log("http image下載url:" + imageURL);
+            Debug.LogError("下載影像檔案失敗：" + www.error);
+        }
+        else
+        {
+            Debug.Log("http image下載完成:" + imageURL);
+            var loadedTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            return TextureToSprite(loadedTexture);
+        }
+        return null;
+    }
+
     public static IEnumerator DownloadImage(string imageURL, Action<Sprite> OnComplete)
     {
         if(string.IsNullOrEmpty(imageURL))
