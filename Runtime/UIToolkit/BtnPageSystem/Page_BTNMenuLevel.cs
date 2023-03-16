@@ -68,7 +68,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
         
     }
     
-    class ExtraParamStruct
+    public class ExtraParamStruct
     {
         public string BookUrl;
         public string MapImageID;
