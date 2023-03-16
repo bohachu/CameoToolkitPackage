@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+using System;
 namespace Cameo.UI
 {
     public class MessageBoxManager : Singleton<MessageBoxManager>
@@ -12,6 +13,7 @@ namespace Cameo.UI
         public float FadeTime = 0.2f;
         public Color BackgroundColor = Color.black;
 
+        public Action OnAllMessageBoxClosed=new Action(() => { });
         private RectTransform rectTran;
         private List<BaseMessageBox> curOpendMessageBoxs = new List<BaseMessageBox>();
         private BaseMessageBox curMsgBox = null;
@@ -34,6 +36,8 @@ namespace Cameo.UI
         }
         void Awake()
         {
+            
+            OnAllMessageBoxClosed=new Action(() => { });
             rectTran = GetComponent<RectTransform>();
             BackgroundOnOff(false);
             msgBoxInfoMap = new Dictionary<string, BaseMessageBox>();
@@ -45,7 +49,7 @@ namespace Cameo.UI
 
         private void OnDestroy()
         {
-            CancelInvoke("onFadeOutFinished");
+            CancelInvoke("AfterCloseBoxShowNextBox");
         }
         
         public BaseMessageBox ShowMessageBox(string TypeName, Dictionary<string, object> dicParams = null, bool isUseBackground = true)
@@ -137,7 +141,7 @@ namespace Cameo.UI
             }
             return Background.enabled;
         }
-        public void OnMessageBoxClosed(BaseMessageBox msgBox)
+          public void OnMessageBoxClosed(BaseMessageBox msgBox)
 		{
 			curOpendMessageBoxs.Remove (msgBox);
 			Destroy (msgBox.gameObject);
@@ -145,21 +149,27 @@ namespace Cameo.UI
 			if (isBackgroundFadable()) 
 			{
                 LeanTween.value(gameObject, BackgroundColor, new Color(0, 0, 0, 0), FadeTime).setOnUpdateColor(updateColor);
-                Invoke ("onFadeOutFinished", FadeTime);
+                Invoke ("AfterCloseBoxShowNextBox", FadeTime);
 			}
             else
             {
+                AfterCloseBoxShowNextBox();
+            }
+           
+        }
+        void AfterCloseBoxShowNextBox()
+        {
+            if (curOpendMessageBoxs.Count > 0)
+            {
                 Background.rectTransform.SetAsLastSibling();
-                if(curOpendMessageBoxs.Count>=1)
-                    curOpendMessageBoxs[curOpendMessageBoxs.Count - 1].transform.SetAsLastSibling();
+                curOpendMessageBoxs[curOpendMessageBoxs.Count - 1].transform.SetAsLastSibling();
+            }
+            if (curOpendMessageBoxs.Count == 0)
+            {
+                BackgroundOnOff(false);
+                OnAllMessageBoxClosed();
             }
         }
-
-		private void onFadeOutFinished()
-		{
-            BackgroundOnOff(false);
-
-		}
 
         private void updateColor(Color color)
         {

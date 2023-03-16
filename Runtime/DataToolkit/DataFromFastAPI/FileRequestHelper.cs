@@ -193,7 +193,36 @@ namespace Cameo
             www.Dispose();
             return returnArray;
         }
+        //未來盡量都用這個，sheet會從第三行開始讀取
+        public async Task<List<T>> LoadSheetAsList<T>(string spreadSheet, string workSheet, string UserAccount, string Token) where T : class
+        {
+            List<T> dataArray = new List<T>();
+            string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseDataUrl,
+                FastAPISettings.AccountKey, UserAccount,
+                FastAPISettings.TokenKey, Token,
+                FastAPISettings.SpreadSheetKey, spreadSheet,
+                FastAPISettings.WorkSheetKey, workSheet);
 
+            UnityWebRequest www = new UnityWebRequest(url);
+
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
+            await www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogErrorFormat(www.error);
+            }
+            else
+            { 
+                dataArray = JsonConvert.DeserializeObject<List<T>>(www.downloadHandler.text);// JsonMapper.ToObject<string[][]>(www.downloadHandler.text);
+               
+                GC.Collect();
+            }
+            www.Dispose();
+            return dataArray;//dataArray;
+        }
         //以每row一個array的方式載入(不含Key，較省資源，但是必須知道一個物件的variable來自array第幾個元素)
         public async Task<T[]> LoadArrayFromStringArray<T>(string spreadSheet, string workSheet, int index, Func<string[], T> parser, string UserAccount, string Token) where T : class
         {
@@ -236,8 +265,11 @@ namespace Cameo
                     }
                     catch (System.Exception e)
                     {
+                        Debug.Log(url);
+                        Debug.Log(www.downloadHandler.text);
+                        Debug.LogError("表單格式錯誤：" + e.Message);
                         Debug.LogError("表單格式錯誤");
-                        for (int ii = 0; i < data.Length; i++)
+                        for (int ii = 0; ii < data.Length; ii++)
                         {
                             Debug.Log(data[ii]);
                         }
