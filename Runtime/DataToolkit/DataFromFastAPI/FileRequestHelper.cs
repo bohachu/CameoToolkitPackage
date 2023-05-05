@@ -12,7 +12,7 @@ namespace Cameo
 {
     public class FileRequestHelper : Singleton<FileRequestHelper>
     {
-        public static string param_to_url(string key, string value)
+public static string param_to_url(string key, string value)
         {
             return string.Format("&{0}={1}", key, value);
         }
@@ -20,7 +20,7 @@ namespace Cameo
         public static async Task<string> FalraGetAPI(string API, string  user, string token,string str_param)
         {
             //Debug.Log(url);
-            string url = string.Format("{0}/?{1}={2}&{3}={4}{5}", FastAPISettings.BaseDataUrl+API,
+            string url = string.Format("{0}/?{1}={2}&{3}={4}{5}", FastAPISettings.BaseAPIUrl+API,
                 FastAPISettings.AccountKey, user,
                 FastAPISettings.TokenKey, token,
                 str_param);

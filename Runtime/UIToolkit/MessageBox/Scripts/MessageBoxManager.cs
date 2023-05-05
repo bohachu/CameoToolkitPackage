@@ -14,7 +14,6 @@ namespace Cameo.UI
         public Color BackgroundColor = Color.black;
 
         public Action OnAllMessageBoxClosed=new Action(() => { });
-         public Action OnAnyMessageBoxOpened=new Action(() => { });
         private RectTransform rectTran;
         private List<BaseMessageBox> curOpendMessageBoxs = new List<BaseMessageBox>();
         private BaseMessageBox curMsgBox = null;
@@ -103,7 +102,7 @@ namespace Cameo.UI
                 onFadeInFinished();
             }
             messageBox.transform.SetAsLastSibling();
-            OnAnyMessageBoxOpened();
+
             return messageBox;
         }
         public void SetBoxOrder(BaseMessageBox messageBox)

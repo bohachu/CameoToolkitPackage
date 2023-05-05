@@ -33,52 +33,66 @@ namespace Cameo
             Hide
         }
         public List<DialogData> dialogDatas;
-        public List<DialogueSet> ConvertToDialogueSet(Dictionary<string,Sprite> Images)
+        public List<DialogueSet> ConvertToDialogueSet(Dictionary<string, Sprite> Images)
         {
             Dictionary<string, DialogueSet> dialogueFilter = GetDialogueSetByGroupID(Images);
-            List <DialogueSet> result = new List<DialogueSet>();
+            List<DialogueSet> result = new List<DialogueSet>();
             foreach (var obj in dialogueFilter)
             {
                 result.Add(obj.Value);
             }
             return result;
         }
-        public Dictionary<string, DialogueSet> GetDialogueSetByGroupID(Dictionary<string,Sprite> Images)
+        public Dictionary<string, DialogueSet> GetDialogueSetByGroupID(Dictionary<string, Sprite> Images)
         {
             Dictionary<string, DialogueSet> dialogueFilter = new Dictionary<string, DialogueSet>();
+            DialogData preData = null;
             foreach (var obj in dialogDatas)
             {
                 var oneDialogue = new DialogueActionUnit(obj);
                 oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
-                if(obj.BGImage == PresetImageCommand.Hide.ToString())
+                //遇到hide指令，就把圖片清空
+                if (obj.BGImage.EndsWith(PresetImageCommand.Hide.ToString()))
                 {
                     oneDialogue.BGImage = null;
-                    oneDialogue.IsBGChange=true;
+                    oneDialogue.IsBGChange = true;
                 }
-                if(obj.CenterImage == PresetImageCommand.Hide.ToString())
+                if (obj.CenterImage.EndsWith(PresetImageCommand.Hide.ToString()))
                 {
                     oneDialogue.CenterImg = null;
-                    oneDialogue.IsCenterImgChange=true;
+                    oneDialogue.IsCenterImgChange = true;
                 }
-               
-                if(Images!=null)
+
+                if (!string.IsNullOrWhiteSpace(obj.BGImage))
                 {
-                    if(!string.IsNullOrWhiteSpace(obj.BGImage))
-                    if(Images.ContainsKey(obj.BGImage))
+                    if(preData!=null && preData.BGImage!=obj.BGImage)
+                        oneDialogue.IsBGChange = true;
+                    if (Images.ContainsKey(obj.BGImage))
                     {
-                        Debug.Log("找到圖片，放入對白:"+obj.BGImage);
+//                        Debug.Log("找到圖片，放入對白:" + obj.BGImage);
                         oneDialogue.BGImage = Images[obj.BGImage];
-                        oneDialogue.IsBGChange=true;
                     }
-                    
-                    if(!string.IsNullOrWhiteSpace(obj.CenterImage))
-                    if(Images.ContainsKey(obj.CenterImage))
+                }
+
+                if (!string.IsNullOrWhiteSpace(obj.CenterImage))
+                {
+                    if (preData != null && preData.CenterImage != obj.CenterImage)
+                    {
+                        oneDialogue.IsCenterImgChange = true;
+                        Debug.Log(obj.Dialogue+":圖片不同，替換前景圖片:" + obj.CenterImage);
+                    }
+                    if (Images.ContainsKey(obj.CenterImage))
                     {
                         oneDialogue.CenterImg = Images[obj.CenterImage];
-                        oneDialogue.IsCenterImgChange=true;
+                    }
+                    else
+                    {
+                        //找不到圖片，可能是其他多媒體例如影片或是iframe
+                        Debug.Log("找不到圖片，可能是其他多媒體例如影片或是iframe:" + obj.CenterImage);
+                        oneDialogue.CenterImg = null;
                     }
                 }
-                
+
 
                 if (dialogueFilter.ContainsKey(obj.GroupID))
                 {
@@ -91,30 +105,47 @@ namespace Cameo
                     oneSet.AdvanceDialogues.Add(oneDialogue);
                     dialogueFilter.Add(obj.GroupID, oneSet);
                 }
+                preData = obj;
             }
             return dialogueFilter;
         }
         public string SpreedSheetName;
         public string WorkSheetName;
-        public async Task loadDataSets(string SpreadSheet, string WorkSheet,string UserAccount, string Token)
+        public async Task loadDataSets(string SpreadSheet, string WorkSheet, string UserAccount, string Token)
         {
+            string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseDataUrl,
+                      FastAPISettings.AccountKey, UserAccount,
+                      FastAPISettings.TokenKey, Token,
+                      FastAPISettings.SpreadSheetKey, SpreadSheet,
+                      FastAPISettings.WorkSheetKey, WorkSheet);
             try
             {
-                string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseDataUrl,
-                        FastAPISettings.AccountKey, UserAccount,
-                        FastAPISettings.TokenKey, Token,
-                        FastAPISettings.SpreadSheetKey, SpreadSheet,
-                        FastAPISettings.WorkSheetKey, WorkSheet);
+
                 string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
                 //Debug.Log("下載對白資料成功");
                 //Debug.Log(jsonStr);
                 dialogDatas = JsonConvert.DeserializeObject<List<DialogData>>(jsonStr);
-
+                ConvertAllURL();
             }
             catch (System.Exception e)
             {
+                Debug.LogError("下載對白資料失敗");
+                Debug.LogError(url);
                 Debug.LogError(e);
             }
+        }
+        void ConvertAllURL()
+        {
+            foreach (var obj in dialogDatas)
+            {
+                obj.Audio = ConvertRouterURL(obj.Audio);
+                obj.BGImage = ConvertRouterURL(obj.BGImage);
+                obj.CenterImage = ConvertRouterURL(obj.CenterImage);
+            }
+        }
+        string ConvertRouterURL(string url)
+        {
+            return Cameo.Cameo_URLRouter.GetURL(url);
         }
     }
     [System.Serializable]
@@ -133,46 +164,47 @@ namespace Cameo
         // Start is called before the first frame update
         public IEnumerator Initializ(string SpreadSheetName, string WorksheetName, string UserAccount, string Token)
         {
-            //Debug.Log("初始化對話資料");
             Setup(SpreadSheetName, WorksheetName);
             yield return dialogueDownloadSets.loadDataSets(SpreadSheetName, WorksheetName, UserAccount, Token).AsIEnumerator();
             ImageDownloadHelper imageDownloadHelper = new ImageDownloadHelper();
             List<string> imageURL = new List<string>();
             foreach (var obj in dialogueDownloadSets.dialogDatas)
             {
-                
-                if (!string.IsNullOrEmpty(obj.BGImage)&& (obj.BGImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
+
+                if (!string.IsNullOrEmpty(obj.BGImage) && (obj.BGImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
                 {
                     //Debug.Log("下載對話背景圖片:" + obj.BGImage);
-                    imageURL.Add(obj.BGImage);
+                    if (DialogueMultiMediaPlayer.isImage(obj.BGImage))
+                        imageURL.Add(obj.BGImage);
                 }
-                if (!string.IsNullOrEmpty(obj.CenterImage)&&(obj.CenterImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
+                if (!string.IsNullOrEmpty(obj.CenterImage) && (obj.CenterImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
                 {
-                    Debug.Log("下載對話前景圖片:" + obj.CenterImage);
-                    imageURL.Add(obj.CenterImage);
+                    if (DialogueMultiMediaPlayer.isImage(obj.CenterImage))
+                        imageURL.Add(obj.CenterImage);
                 }
             }
             yield return imageDownloadHelper.DownloadImages(imageURL);
             DialogueSets = dialogueDownloadSets.GetDialogueSetByGroupID(imageDownloadHelper.LoadedImages);
         }
-  
-        public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd=null)
+
+        public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd = null)
         {
-            if(string.IsNullOrWhiteSpace(GroupID))
+            if (string.IsNullOrWhiteSpace(GroupID))
             {
                 Debug.Log("對話組ID為空，跳過對話直接執行下一步");
-                if(OnDialogueEnd!=null) OnDialogueEnd.Invoke();
+                if (OnDialogueEnd != null) OnDialogueEnd.Invoke();
                 return;
             }
-            if(!DialogueSets.ContainsKey(GroupID))
+            if (!DialogueSets.ContainsKey(GroupID))
             {
-                Debug.LogError("對話群組不存在，請檢查上搞系統："+ GroupID);
-                if(OnDialogueEnd!=null) OnDialogueEnd.Invoke();
+                Debug.LogError("對話群組不存在，請檢查上搞系統：" + GroupID);
+                if (OnDialogueEnd != null) OnDialogueEnd.Invoke();
                 return;
             }
-            Debug.Log("啟動對話："+GroupID);
-            if(OnDialogueEnd!=null)
-                DialogueSets[GroupID].StartDialogues(() => {
+            //Debug.Log("啟動對話："+GroupID);
+            if (OnDialogueEnd != null)
+                DialogueSets[GroupID].StartDialogues(() =>
+                {
                     DialogueSets[GroupID].Hide();
                     OnDialogueEnd.Invoke();
                 });

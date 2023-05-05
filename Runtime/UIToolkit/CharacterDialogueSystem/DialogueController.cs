@@ -166,6 +166,8 @@ public class DialogueController : MonoBehaviour
     public Button dialogueBTN;
     public Image BGImage;
     public Image CenterImage;
+    public DialogueMultiMediaPlayer BGMediaPlayer;
+    public DialogueMultiMediaPlayer CenterMediaPlayer;
 
     private int InitDialogueOrder=2;
     private Canvas UICanvas;
@@ -392,6 +394,8 @@ public class DialogueController : MonoBehaviour
         CenterImage.sprite = null;
         CenterImage.color = new Color(1, 1, 1, 0);
         CenterImage.gameObject.SetActive(false);
+        BGMediaPlayer.Reset();
+        CenterMediaPlayer.Reset();
     }
 
     public void ShowHideDialogue(bool isShow)
@@ -399,6 +403,8 @@ public class DialogueController : MonoBehaviour
         DialogRoot.SetActive(isShow);
         BGImage.gameObject.SetActive(isShow);
         CenterImage.gameObject.SetActive(isShow);
+        BGMediaPlayer.IsShow(isShow);
+        CenterMediaPlayer.IsShow(isShow);
         //dialogueBTN.gameObject.SetActive(isShow);
 
     }
@@ -439,7 +445,7 @@ public class DialogueController : MonoBehaviour
     {
         if (dialogueSource.Contains(PlayerReplaceString))
         {
-            Debug.Log("字串包含：" + PlayerReplaceString+"替換為:"+ PlayerSet.CharacterName);
+//            Debug.Log("字串包含：" + PlayerReplaceString+"替換為:"+ PlayerSet.CharacterName);
             return dialogueSource.Replace(PlayerReplaceString, PlayerSet.CharacterName);
         }
         else
@@ -464,9 +470,11 @@ public class DialogueController : MonoBehaviour
                 BGImage.gameObject.SetActive(false);
                 BGImage.color = new Color(1,1,1,0);
             }
+            BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
         }
         if (dialogueActionUnit.IsCenterImgChange)
         {
+            //更換中間圖片，如果沒有圖片則隱藏
             CenterImage.sprite = dialogueActionUnit.CenterImg;
             CenterImage.color = Color.white;
             if (dialogueActionUnit.CenterImg != null)
@@ -479,6 +487,10 @@ public class DialogueController : MonoBehaviour
                 CenterImage.gameObject.SetActive(false);
                 CenterImage.color = new Color(1, 1, 1, 0);
             }
+            //如果是影片或是iframe則播放
+            Debug.Log("CenterImgChange 播放影片或是iframe:" + dialogueActionUnit.originData.CenterImage);
+            CenterMediaPlayer.PlayMedia(dialogueActionUnit.originData.CenterImage);
+            
         }
         if (dialogueActionUnit.IsAudioEnable)
         {
