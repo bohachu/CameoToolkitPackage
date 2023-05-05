@@ -14,18 +14,19 @@ namespace Cameo.UI
         public Color BackgroundColor = Color.black;
 
         public Action OnAllMessageBoxClosed=new Action(() => { });
+         public Action OnAnyMessageBoxOpened=new Action(() => { });
         private RectTransform rectTran;
         private List<BaseMessageBox> curOpendMessageBoxs = new List<BaseMessageBox>();
         private BaseMessageBox curMsgBox = null;
         private Dictionary<string, object> paramMapping;
         private Dictionary<string, BaseMessageBox> msgBoxInfoMap;
-        public void ShowComfirmBox(string msg, UnityEngine.Events.UnityAction onClick, UnityEngine.Events.UnityAction OnCancel = null)
+        public BaseMessageBox ShowComfirmBox(string msg, UnityEngine.Events.UnityAction onClick, UnityEngine.Events.UnityAction OnCancel = null,bool isUseBackground=true)
         {
             Dictionary<string, object> paramMap = new Dictionary<string, object>();
             paramMap[UI_ComfirmCloseBox.Parm_Msg] = msg;
             paramMap[UI_ComfirmCloseBox.Parm_OK] = onClick;
             paramMap[UI_ComfirmCloseBox.Parm_Cancel] = OnCancel;
-            MessageBoxManager.Instance.ShowMessageBox(UI_ComfirmCloseBox.BOX_ID, paramMap);
+            return MessageBoxManager.Instance.ShowMessageBox(UI_ComfirmCloseBox.BOX_ID, paramMap,isUseBackground);
         }
         public void ShowSimpleMessageBox(string msg, UnityEngine.Events.UnityAction onClick = null)
         {
@@ -102,7 +103,7 @@ namespace Cameo.UI
                 onFadeInFinished();
             }
             messageBox.transform.SetAsLastSibling();
-
+            OnAnyMessageBoxOpened();
             return messageBox;
         }
         public void SetBoxOrder(BaseMessageBox messageBox)

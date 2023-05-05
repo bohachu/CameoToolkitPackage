@@ -12,7 +12,41 @@ namespace Cameo
 {
     public class FileRequestHelper : Singleton<FileRequestHelper>
     {
+        public static string param_to_url(string key, string value)
+        {
+            return string.Format("&{0}={1}", key, value);
+        }
+        //多用：通用的基本的get api, API="/xx/xx/", str_param="&a=1&b=2"
+        public static async Task<string> FalraGetAPI(string API, string  user, string token,string str_param)
+        {
+            //Debug.Log(url);
+            string url = string.Format("{0}/?{1}={2}&{3}={4}{5}", FastAPISettings.BaseDataUrl+API,
+                FastAPISettings.AccountKey, user,
+                FastAPISettings.TokenKey, token,
+                str_param);
 
+            UnityWebRequest www = new UnityWebRequest(url);
+
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.disposeUploadHandlerOnDispose = true;
+            www.disposeDownloadHandlerOnDispose = true;
+            await www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("下載sheet失敗" + url);
+                Debug.Log(www.error);
+                www.Dispose();
+                return null;
+            }
+            else
+            {
+                //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
+                var data = www.downloadHandler.text;
+                www.Dispose();
+                return data;
+            }
+        }
         public async Task<T> LoadJson<T>(string url) where T : class
         {
             //Debug.Log("LoadJson: " + url);

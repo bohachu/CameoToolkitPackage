@@ -71,7 +71,7 @@ namespace Cameo
                         oneDialogue.IsBGChange=true;
                     }
                     
-                    if(!string.IsNullOrWhiteSpace(obj.BGImage))
+                    if(!string.IsNullOrWhiteSpace(obj.CenterImage))
                     if(Images.ContainsKey(obj.CenterImage))
                     {
                         oneDialogue.CenterImg = Images[obj.CenterImage];
@@ -133,6 +133,7 @@ namespace Cameo
         // Start is called before the first frame update
         public IEnumerator Initializ(string SpreadSheetName, string WorksheetName, string UserAccount, string Token)
         {
+            //Debug.Log("初始化對話資料");
             Setup(SpreadSheetName, WorksheetName);
             yield return dialogueDownloadSets.loadDataSets(SpreadSheetName, WorksheetName, UserAccount, Token).AsIEnumerator();
             ImageDownloadHelper imageDownloadHelper = new ImageDownloadHelper();
@@ -147,6 +148,7 @@ namespace Cameo
                 }
                 if (!string.IsNullOrEmpty(obj.CenterImage)&&(obj.CenterImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
                 {
+                    Debug.Log("下載對話前景圖片:" + obj.CenterImage);
                     imageURL.Add(obj.CenterImage);
                 }
             }
@@ -168,7 +170,7 @@ namespace Cameo
                 if(OnDialogueEnd!=null) OnDialogueEnd.Invoke();
                 return;
             }
-            //Debug.Log("啟動對話："+GroupID);
+            Debug.Log("啟動對話："+GroupID);
             if(OnDialogueEnd!=null)
                 DialogueSets[GroupID].StartDialogues(() => {
                     DialogueSets[GroupID].Hide();
