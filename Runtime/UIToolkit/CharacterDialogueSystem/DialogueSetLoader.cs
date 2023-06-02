@@ -65,24 +65,33 @@ namespace Cameo
 
                 if (!string.IsNullOrWhiteSpace(obj.BGImage))
                 {
-                    if(preData!=null && preData.BGImage!=obj.BGImage)
+                    if(preData==null) 
                         oneDialogue.IsBGChange = true;
+                    if(preData!=null && preData.BGImage!=obj.BGImage)
+                    {
+                        oneDialogue.IsBGChange = true;
+                   //      Debug.Log(obj.Dialogue+":圖片不同，替換背景圖片:" + obj.BGImage);
+                    }
+                      
                     if (Images.ContainsKey(obj.BGImage))
                     {
-//                        Debug.Log("找到圖片，放入對白:" + obj.BGImage);
+//                       Debug.Log("找到背景圖片，放入對白:" + obj.BGImage);
                         oneDialogue.BGImage = Images[obj.BGImage];
                     }
                 }
 
                 if (!string.IsNullOrWhiteSpace(obj.CenterImage))
                 {
+                    if(preData==null) 
+                        oneDialogue.IsCenterImgChange = true;
                     if (preData != null && preData.CenterImage != obj.CenterImage)
                     {
                         oneDialogue.IsCenterImgChange = true;
-                        Debug.Log(obj.Dialogue+":圖片不同，替換前景圖片:" + obj.CenterImage);
+               //         Debug.Log(obj.Dialogue+":圖片不同，替換前景圖片:" + obj.CenterImage);
                     }
                     if (Images.ContainsKey(obj.CenterImage))
                     {
+                 //         Debug.Log("找到鉗景圖片，放入對白:" + obj.CenterImage);
                         oneDialogue.CenterImg = Images[obj.CenterImage];
                     }
                     else
@@ -122,8 +131,8 @@ namespace Cameo
             {
 
                 string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
-                //Debug.Log("下載對白資料成功");
-                //Debug.Log(jsonStr);
+  //              Debug.Log("下載對白資料成功");
+//                Debug.Log(jsonStr);
                 dialogDatas = JsonConvert.DeserializeObject<List<DialogData>>(jsonStr);
                 ConvertAllURL();
             }
@@ -145,7 +154,14 @@ namespace Cameo
         }
         string ConvertRouterURL(string url)
         {
+            if(isIframe(url)) return url;
             return Cameo.Cameo_URLRouter.GetURL(url);
+        }
+        bool isIframe(string url)
+        {
+            //如果有包含iframe 就不轉換
+            Debug.Log("檢查是否為iframe:"+url+"如果有包含iframe字串不轉換domaine");
+            return url.Contains("iframe");
         }
     }
     [System.Serializable]
@@ -173,14 +189,22 @@ namespace Cameo
 
                 if (!string.IsNullOrEmpty(obj.BGImage) && (obj.BGImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
                 {
-                    //Debug.Log("下載對話背景圖片:" + obj.BGImage);
+                   
                     if (DialogueMultiMediaPlayer.isImage(obj.BGImage))
-                        imageURL.Add(obj.BGImage);
+                    {
+//                         Debug.Log("下載對話背景圖片:" + obj.BGImage);
+                         imageURL.Add(obj.BGImage);
+                    }
+                        
                 }
                 if (!string.IsNullOrEmpty(obj.CenterImage) && (obj.CenterImage != DialogueDataSet.PresetImageCommand.Hide.ToString()))
                 {
                     if (DialogueMultiMediaPlayer.isImage(obj.CenterImage))
+                    {
                         imageURL.Add(obj.CenterImage);
+               //         Debug.Log("下載對話前景圖片:" + obj.CenterImage);
+                    }
+                        
                 }
             }
             yield return imageDownloadHelper.DownloadImages(imageURL);
@@ -189,6 +213,7 @@ namespace Cameo
 
         public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd = null)
         {
+            DialogueController.Instance.Reset(); // 重置對話系統
             if (string.IsNullOrWhiteSpace(GroupID))
             {
                 Debug.Log("對話組ID為空，跳過對話直接執行下一步");
@@ -207,6 +232,7 @@ namespace Cameo
                 {
                     DialogueSets[GroupID].Hide();
                     OnDialogueEnd.Invoke();
+                    DialogueController.Instance.Reset();// 完成了對話重置對話系統
                 });
             else
                 DialogueSets[GroupID].StartDialogues();

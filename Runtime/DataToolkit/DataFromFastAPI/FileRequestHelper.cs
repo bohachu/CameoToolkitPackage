@@ -12,47 +12,16 @@ namespace Cameo
 {
     public class FileRequestHelper : Singleton<FileRequestHelper>
     {
-public static string param_to_url(string key, string value)
-        {
-            return string.Format("&{0}={1}", key, value);
-        }
-        //多用：通用的基本的get api, API="/xx/xx/", str_param="&a=1&b=2"
-        public static async Task<string> FalraGetAPI(string API, string  user, string token,string str_param)
-        {
-            //Debug.Log(url);
-            string url = string.Format("{0}/?{1}={2}&{3}={4}{5}", FastAPISettings.BaseAPIUrl+API,
-                FastAPISettings.AccountKey, user,
-                FastAPISettings.TokenKey, token,
-                str_param);
 
-            UnityWebRequest www = new UnityWebRequest(url);
-
-            www.downloadHandler = new DownloadHandlerBuffer();
-            www.disposeUploadHandlerOnDispose = true;
-            www.disposeDownloadHandlerOnDispose = true;
-            await www.SendWebRequest();
-
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log("下載sheet失敗" + url);
-                Debug.Log(www.error);
-                www.Dispose();
-                return null;
-            }
-            else
-            {
-                //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
-                var data = www.downloadHandler.text;
-                www.Dispose();
-                return data;
-            }
-        }
         public async Task<T> LoadJson<T>(string url) where T : class
         {
             //Debug.Log("LoadJson: " + url);
 
             UnityWebRequest www = new UnityWebRequest(url);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.downloadHandler = new DownloadHandlerBuffer();
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
@@ -74,7 +43,7 @@ public static string param_to_url(string key, string value)
                 }
                 catch (Exception e)
                 {
-                    Debug.LogFormat("Load {0} error: {1},{2}", url, data, e);
+                    Debug.LogErrorFormat("Load {0} error: {1},{2}", url, data, e);
 
                     return null;
                 }
@@ -88,7 +57,10 @@ public static string param_to_url(string key, string value)
             //Debug.Log("LoadJson with parser: " + url);
 
             UnityWebRequest www = new UnityWebRequest(url);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.downloadHandler = new DownloadHandlerBuffer();
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
@@ -112,13 +84,18 @@ public static string param_to_url(string key, string value)
 
         public async Task<string> LoadJsonString(string url)
         {
-            //Debug.Log(url);
-
-            UnityWebRequest www = new UnityWebRequest(url);
-
+         //   Debug.Log("01 LoadJsonString create request");
+            UnityWebRequest www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
+       #if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
+           // Debug.Log("02 LoadJsonString: created ");
             www.downloadHandler = new DownloadHandlerBuffer();
+          //  Debug.Log("03 LoadJsonString: created buffer ");
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
+          //  Debug.Log("04 LoadJsonString: ");
             await www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -131,17 +108,40 @@ public static string param_to_url(string key, string value)
             else
             {
                 //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
+            //     Debug.Log("下載成功" + url);
                 var data = www.downloadHandler.text;
                 www.Dispose();
                 return data;
             }
         }
 
+        public static string param_to_url(string key, string value)
+        {
+            return string.Format("&{0}={1}", key, value);
+        }
+        //多用：通用的基本的get api, API="/xx/xx/", str_param="&a=1&b=2"
+        public async Task<string> FalraGetAPI(string API, string  user, string token,string str_param)
+        {
+            //Debug.Log("request api : "+FastAPISettings.BaseAPIUrl+API);
+            string url = string.Format("{0}/?{1}={2}&{3}={4}{5}", FastAPISettings.BaseAPIUrl+API,
+                FastAPISettings.AccountKey, user,
+                FastAPISettings.TokenKey, token,
+                str_param);
+            Debug.Log("api url:"+url);
+            string result = await LoadJsonString(url);
+            return result;
+           
+        }
+        
         public async Task InvokeAPI(string url)
         {
             //Debug.Log(url);
 
             UnityWebRequest www = new UnityWebRequest(url);
+            #if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
@@ -159,7 +159,10 @@ public static string param_to_url(string key, string value)
             //Debug.Log(url);
 
             UnityWebRequest www = new UnityWebRequest(url);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.downloadHandler = new DownloadHandlerBuffer();
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
@@ -197,7 +200,10 @@ public static string param_to_url(string key, string value)
                 FastAPISettings.WorkSheetKey, workSheet);
 
             UnityWebRequest www = new UnityWebRequest(url);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.downloadHandler = new DownloadHandlerBuffer();
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
@@ -238,7 +244,10 @@ public static string param_to_url(string key, string value)
                 FastAPISettings.WorkSheetKey, workSheet);
 
             UnityWebRequest www = new UnityWebRequest(url);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.downloadHandler = new DownloadHandlerBuffer();
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
@@ -271,7 +280,10 @@ public static string param_to_url(string key, string value)
             //  Debug.Log(url);
 
             UnityWebRequest www = new UnityWebRequest(url);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.downloadHandler = new DownloadHandlerBuffer();
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
@@ -320,7 +332,10 @@ public static string param_to_url(string key, string value)
         public async Task<string> UploadGameData(string fileName, object data, string UserAccount, string Token)
         {
             UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetRequestUrl, "POST");
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             Dictionary<string, string> requestBody = new Dictionary<string, string>();
             requestBody[FastAPISettings.AccountKey] = UserAccount;
             requestBody[FastAPISettings.TokenKey] = Token;
@@ -358,7 +373,10 @@ public static string param_to_url(string key, string value)
         public async Task<string> UploadMessageData(List<string> readedMessageIDs, List<string> unreadedMessageIDs, string UserAccount, string Token)
         {
             UnityWebRequest www = new UnityWebRequest(FastAPISettings.SetMessageReadUrl, "POST");
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
             requestBody[FastAPISettings.AccountKey] = UserAccount;
             requestBody[FastAPISettings.TokenKey] = Token;
@@ -390,7 +408,7 @@ public static string param_to_url(string key, string value)
                 return "";
             }
         }
-public static async Task<string> UploadRankScore(string url, string userAccount, string token, string gameName, string rankFileName, string userName, int score)
+        public static async Task<string> UploadRankScore(string url, string userAccount, string token, string gameName, string rankFileName, string userName, int score)
         {
             using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
             {
@@ -402,7 +420,10 @@ public static async Task<string> UploadRankScore(string url, string userAccount,
                             requestBody["str_name"] = userName;
                             requestBody[FastAPISettings.RankScore] = score;
                 string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
                 //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
                 www.uploadHandler = (UploadHandler)new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonStr));
                 www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -435,7 +456,10 @@ public static async Task<string> UploadRankScore(string url, string userAccount,
                 requestBody[FastAPISettings.LogKey] = logs;
 
                 string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
                 //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
                 www.uploadHandler = (UploadHandler)new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonStr));
                 www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -468,6 +492,10 @@ public static async Task<string> UploadRankScore(string url, string userAccount,
             form.AddBinaryData(FastAPISettings.UploadFileKey, file, fileName, "image/jpeg");
 
             UnityWebRequest www = UnityWebRequest.Post(url, form);
+        #if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
             await www.SendWebRequest();
@@ -489,7 +517,10 @@ public static async Task<string> UploadRankScore(string url, string userAccount,
         public async Task<Texture2D> DownloadImage(string url)
         {
             UnityWebRequest www = new UnityWebRequest(url, "GET");
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
 
             www.SetRequestHeader("Content-Type", "image/jpeg");
@@ -532,7 +563,10 @@ public static async Task<string> UploadRankScore(string url, string userAccount,
             T[] returnArray = null;
 
             UnityWebRequest www = new UnityWebRequest(FastAPISettings.BaseFapi, "POST");
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
             requestBody["command"] = "file";
             requestBody["action"] = "read-files-not-null";
@@ -585,7 +619,10 @@ public static async Task<string> UploadRankScore(string url, string userAccount,
             T[] returnArray = null;
 
             UnityWebRequest www = new UnityWebRequest(FastAPISettings.BaseFapi, "POST");
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
             requestBody["command"] = "csv";
             requestBody["action"] = "group-last";
@@ -640,7 +677,10 @@ public static async Task<string> UploadRankScore(string url, string userAccount,
         public async Task<string> AppendAndCreate(string path, string[] columns, string[] values)
         {
             UnityWebRequest www = new UnityWebRequest(FastAPISettings.BaseFapi, "POST");
-
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
             Dictionary<string, object> requestBody = new Dictionary<string, object>();
             requestBody["command"] = "csv";
             requestBody["action"] = "create-append";

@@ -106,7 +106,7 @@ public class ImageDownloadHelper
         }
         yield return null;
     }
-    static Sprite TextureToSprite(Texture2D texture)
+     public static Sprite TextureToSprite(Texture2D texture)
     {
         var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100);
         return sprite;

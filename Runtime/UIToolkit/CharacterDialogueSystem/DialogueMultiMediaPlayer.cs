@@ -16,7 +16,8 @@ namespace Cameo
             //如果是隱藏指令，就關閉
             if(url.EndsWith(DialogueDataSet.PresetImageCommand.Hide.ToString()))
             {
-                CloseMediaEvent();
+                if(CloseMediaEvent!=null)
+                    CloseMediaEvent();
                 return;
             }
             if (string.IsNullOrEmpty(url))
@@ -34,13 +35,15 @@ namespace Cameo
                 PlayMedia(preUrl);
             }else
             {
-                CloseMediaEvent();
+                if(CloseMediaEvent!=null)
+                    CloseMediaEvent();
             }
         }
         public void Reset()
         {
             preUrl = "";
-            CloseMediaEvent();
+            if(CloseMediaEvent!=null)
+                CloseMediaEvent();
         }
         public static bool isImage(string url)
         {
@@ -56,7 +59,19 @@ namespace Cameo
         }
         public static bool isIframe(string url)
         {
-            return url.EndsWith(".html", System.StringComparison.OrdinalIgnoreCase) || url.EndsWith(".htm", System.StringComparison.OrdinalIgnoreCase);
+            try
+            {
+
+                Newtonsoft.Json.Linq.JObject jObject = Newtonsoft.Json.Linq.JObject.Parse(url);
+                return jObject.ContainsKey("iframe");
+            }
+            catch (System.Exception e)
+            {
+                
+                return false;
+            }
+            
+           
         }
     }
 }
