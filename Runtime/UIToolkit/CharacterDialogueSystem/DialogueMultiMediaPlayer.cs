@@ -32,7 +32,8 @@ namespace Cameo
         {
             if(isShow)
             {
-                PlayMedia(preUrl);
+                if(!string.IsNullOrEmpty(preUrl))
+                    PlayMedia(preUrl);
             }else
             {
                 if(CloseMediaEvent!=null)
@@ -61,7 +62,6 @@ namespace Cameo
         {
             try
             {
-
                 Newtonsoft.Json.Linq.JObject jObject = Newtonsoft.Json.Linq.JObject.Parse(url);
                 return jObject.ContainsKey("iframe");
             }

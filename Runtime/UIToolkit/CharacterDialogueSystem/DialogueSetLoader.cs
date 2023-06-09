@@ -75,7 +75,7 @@ namespace Cameo
                       
                     if (Images.ContainsKey(obj.BGImage))
                     {
-//                       Debug.Log("找到背景圖片，放入對白:" + obj.BGImage);
+                  //     Debug.Log(obj.Dialogue+"，對白找到背景圖片:" + obj.BGImage);
                         oneDialogue.BGImage = Images[obj.BGImage];
                     }
                 }
@@ -97,7 +97,7 @@ namespace Cameo
                     else
                     {
                         //找不到圖片，可能是其他多媒體例如影片或是iframe
-                        Debug.Log("找不到圖片，可能是其他多媒體例如影片或是iframe:" + obj.CenterImage);
+//                        Debug.Log("找不到圖片，可能是其他多媒體例如影片或是iframe:" + obj.CenterImage);
                         oneDialogue.CenterImg = null;
                     }
                 }
@@ -160,7 +160,7 @@ namespace Cameo
         bool isIframe(string url)
         {
             //如果有包含iframe 就不轉換
-            Debug.Log("檢查是否為iframe:"+url+"如果有包含iframe字串不轉換domaine");
+//            Debug.Log("檢查是否為iframe:"+url+"如果有包含iframe字串不轉換domaine");
             return url.Contains("iframe");
         }
     }
@@ -230,9 +230,12 @@ namespace Cameo
             if (OnDialogueEnd != null)
                 DialogueSets[GroupID].StartDialogues(() =>
                 {
+                    DialogueController.Instance.Reset();// 完成了對話重置對話系統
                     DialogueSets[GroupID].Hide();
                     OnDialogueEnd.Invoke();
-                    DialogueController.Instance.Reset();// 完成了對話重置對話系統
+                    //Debug.Log("對話結束:"+GroupID);
+                    
+
                 });
             else
                 DialogueSets[GroupID].StartDialogues();

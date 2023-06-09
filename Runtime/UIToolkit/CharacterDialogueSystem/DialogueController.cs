@@ -388,11 +388,10 @@ public class DialogueController : MonoBehaviour
     }
     public void Reset()
     {
+        Debug.Log("Reset");
         BGImage.sprite = null;
         BGImage.gameObject.SetActive(false);
-        BGImage.color = new Color(1, 1, 1, 0);
         CenterImage.sprite = null;
-        CenterImage.color = new Color(1, 1, 1, 0);
         CenterImage.gameObject.SetActive(false);
         BGMediaPlayer.Reset();
         CenterMediaPlayer.Reset();
@@ -408,6 +407,7 @@ public class DialogueController : MonoBehaviour
         //dialogueBTN.gameObject.SetActive(isShow);
 
     }
+    
     private void AddBTNClickSound(Button btn)
     {
         btn.onClick.AddListener(delegate {
@@ -456,19 +456,19 @@ public class DialogueController : MonoBehaviour
     void ShowTextAndAction(DialogueActionUnit dialogueActionUnit)
     {
         DialogueText.text = replacePlayerName(dialogueActionUnit.Dialogue);
+        SetCharacterExpression(dialogueActionUnit.characterExpression);
         if(dialogueActionUnit.IsBGChange)
         {
+            Debug.Log("BGChange");
             BGImage.sprite = dialogueActionUnit.BGImage;
 
             if (dialogueActionUnit.BGImage != null)
             {
                 BGImage.gameObject.SetActive(true);
-                BGImage.color = Color.white;
             }
             else
             {
                 BGImage.gameObject.SetActive(false);
-                BGImage.color = new Color(1,1,1,0);
             }
             BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
         }
@@ -479,13 +479,11 @@ public class DialogueController : MonoBehaviour
             CenterImage.color = Color.white;
             if (dialogueActionUnit.CenterImg != null)
             {
-                CenterImage.color = Color.white;
                 CenterImage.gameObject.SetActive(true);
             }
             else
             {   
                 CenterImage.gameObject.SetActive(false);
-                CenterImage.color = new Color(1, 1, 1, 0);
             }
             //如果是影片或是iframe則播放
             Debug.Log("CenterImgChange 播放影片或是iframe:" + dialogueActionUnit.originData.CenterImage);
@@ -502,7 +500,7 @@ public class DialogueController : MonoBehaviour
             
         }
            
-        SetCharacterExpression(dialogueActionUnit.characterExpression);
+        
     }
     bool ShowNextDialogue(List<DialogueActionUnit> text, Action action, BTNType finalBTN)
     {
