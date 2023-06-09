@@ -400,8 +400,24 @@ public class DialogueController : MonoBehaviour
     public void ShowHideDialogue(bool isShow)
     {
         DialogRoot.SetActive(isShow);
-        BGImage.gameObject.SetActive(isShow);
-        CenterImage.gameObject.SetActive(isShow);
+        if(isShow)
+        {
+            if(BGImage.sprite!=null)
+            {
+                BGImage.gameObject.SetActive(isShow);
+            }
+            if(CenterImage.sprite!=null)
+            {
+                CenterImage.gameObject.SetActive(isShow);
+            }
+        }
+        else
+        {
+             BGImage.gameObject.SetActive(false);
+              CenterImage.gameObject.SetActive(false);
+        }
+       
+       
         BGMediaPlayer.IsShow(isShow);
         CenterMediaPlayer.IsShow(isShow);
         //dialogueBTN.gameObject.SetActive(isShow);
@@ -426,9 +442,12 @@ public class DialogueController : MonoBehaviour
         }
         dialogueBTN.gameObject.SetActive(false);
         dialogueBTN2.gameObject.SetActive(false);
-        Reset();
+        BGImage.sprite = null;
+        BGImage.gameObject.SetActive(false);
+        CenterImage.sprite = null;
+        CenterImage.gameObject.SetActive(false);
         DialogRoot.SetActive(false);
-        
+        Reset();
        
     }
    
@@ -453,15 +472,17 @@ public class DialogueController : MonoBehaviour
             return dialogueSource;
         }
     }
+   
     void ShowTextAndAction(DialogueActionUnit dialogueActionUnit)
     {
         DialogueText.text = replacePlayerName(dialogueActionUnit.Dialogue);
         SetCharacterExpression(dialogueActionUnit.characterExpression);
         if(dialogueActionUnit.IsBGChange)
         {
-            Debug.Log("BGChange");
+            
+            Debug.Log("BGChange:"+dialogueActionUnit.BGImage+","+dialogueActionUnit.originData.BGImage);
             BGImage.sprite = dialogueActionUnit.BGImage;
-
+             Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
             if (dialogueActionUnit.BGImage != null)
             {
                 BGImage.gameObject.SetActive(true);
@@ -470,7 +491,10 @@ public class DialogueController : MonoBehaviour
             {
                 BGImage.gameObject.SetActive(false);
             }
-            BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
+          
+            //BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
+             Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
+             
         }
         if (dialogueActionUnit.IsCenterImgChange)
         {

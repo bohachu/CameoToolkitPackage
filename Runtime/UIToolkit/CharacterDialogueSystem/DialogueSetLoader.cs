@@ -192,7 +192,7 @@ namespace Cameo
                    
                     if (DialogueMultiMediaPlayer.isImage(obj.BGImage))
                     {
-//                         Debug.Log("下載對話背景圖片:" + obj.BGImage);
+                        Debug.Log("下載對話背景圖片:" + obj.BGImage);
                          imageURL.Add(obj.BGImage);
                     }
                         
@@ -230,7 +230,7 @@ namespace Cameo
             if (OnDialogueEnd != null)
                 DialogueSets[GroupID].StartDialogues(() =>
                 {
-                    DialogueController.Instance.Reset();// 完成了對話重置對話系統
+                    DialogueController.Instance.Reset();// 不能在這裡reset, 會導致最後一句對話沒有顯示畫面
                     DialogueSets[GroupID].Hide();
                     OnDialogueEnd.Invoke();
                     //Debug.Log("對話結束:"+GroupID);
