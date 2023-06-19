@@ -14,6 +14,7 @@ namespace Cameo.UI
         public Color BackgroundColor = Color.black;
 
         public Action OnAllMessageBoxClosed=new Action(() => { });
+         public Action OnAnyMessageBoxOpened=new Action(() => { });
         private RectTransform rectTran;
         private List<BaseMessageBox> curOpendMessageBoxs = new List<BaseMessageBox>();
         private BaseMessageBox curMsgBox = null;
@@ -36,7 +37,6 @@ namespace Cameo.UI
         }
         void Awake()
         {
-            
             OnAllMessageBoxClosed=new Action(() => { });
             rectTran = GetComponent<RectTransform>();
             BackgroundOnOff(false);
@@ -51,7 +51,6 @@ namespace Cameo.UI
         {
             CancelInvoke("AfterCloseBoxShowNextBox");
         }
-        
         public BaseMessageBox ShowMessageBox(string TypeName, Dictionary<string, object> dicParams = null, bool isUseBackground = true)
         {
             curMsgBox = msgBoxInfoMap[TypeName];
@@ -64,7 +63,6 @@ namespace Cameo.UI
         }
         public BaseMessageBox ShowMessageBox(BaseMessageBox boxPrefab,Dictionary<string, object> dicParams = null, bool isUseBackground = true)
         {
-
             Background.raycastTarget = true;
 
             paramMapping = dicParams;
@@ -102,7 +100,7 @@ namespace Cameo.UI
                 onFadeInFinished();
             }
             messageBox.transform.SetAsLastSibling();
-
+         
             return messageBox;
         }
         public void SetBoxOrder(BaseMessageBox messageBox)
@@ -121,6 +119,7 @@ namespace Cameo.UI
                     curOpendMessageBoxs[i].Open(this);
                 }
             }
+            OnAnyMessageBoxOpened();
         }
 
         public void CloseAllOpenedBoxWithoutInvokeClosedFunc()

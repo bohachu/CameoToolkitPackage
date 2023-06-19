@@ -4,10 +4,28 @@ using UnityEngine;
 
 using Cameo;
 using Cameo.UI;
-
+using Sirenix.OdinInspector;
 public class UI_BTNDataManager : Singleton<UI_BTNDataManager>
 {
+    public List<string> preloaderIndexNames;
     public List<UI_BTNPageDataLoader> preloaders;
+
+    public GameObject BTNPageDataLoaderPrefab;
+
+    [Button]
+    public void CreatePreloaderByName()
+    {
+        //preloaders = new List<UI_BTNPageDataLoader>();
+        foreach (var name in preloaderIndexNames)
+        {
+            var preloader = Instantiate(BTNPageDataLoaderPrefab).GetComponent<UI_BTNPageDataLoader>();
+            preloader.BTNMenuUniqueID= name;
+            preloader.name = name;
+            preloader.transform.SetParent(transform);
+            preloaders.Add(preloader);
+        }
+    }
+
     public IEnumerator WaitForloading(string BTNMenuUniqueID)
     {
         var loader = GetPreloader(BTNMenuUniqueID);
@@ -65,8 +83,7 @@ public class UI_BTNDataManager : Singleton<UI_BTNDataManager>
                 return obj;
             
         }
-        Debug.LogError("找不到對應的 BTN Menu Preloader, 請設定場景中"+name);
-        Debug.Log("對應ID:"+BTNMenuUniqueID);
+        Debug.LogError("找不到對應的 BTN Menu Preloader, 請設定場景中"+name+",對應ID:"+BTNMenuUniqueID);
         return null;
     }
     public IEnumerator LoadAll()

@@ -10,6 +10,27 @@ using Newtonsoft.Json;
 /// </summary>
 public class Page_BTNMenuLevel : Page_BTNMenuPage
 {
+    [System.Serializable]
+    public class LancherSelector
+    {
+        public string LancherName;
+        public UI_BTNLancherBase Lancher;
+    }
+    public List<LancherSelector> LancherSelectors;
+    UI_BTNLancherBase GetLancher(string LancherName)
+    {
+        foreach (var item in LancherSelectors)
+        {
+            if(item.LancherName==LancherName)
+            {
+                return item.Lancher;
+            }
+            
+        }
+        Debug.LogError("找不到LancherName:"+LancherName);
+        return null;
+    }
+
     public Image MapUI;
     public List<Button> ExtraUrlBTN;
 
@@ -72,6 +93,17 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
     {
         public string BookUrl;
         public string MapImageID;
+        public string GameLauncher;
+    }
+
+    void SetupLancher()
+    {
+        var BTNData = UI_BTNDataManager.Instance.GetBTNData(BTNMenuUniqueID);
+         for(int i=0;i< BTNData.Count; i++)
+        {
+             var eachExtraParam = JsonConvert.DeserializeObject<ExtraParamStruct>(BTNData[i].ExtraParam);
+            buttons[i].btnLuncher= GetLancher(eachExtraParam.GameLauncher);
+        }
     }
 
     public override void SetupBTNUI()

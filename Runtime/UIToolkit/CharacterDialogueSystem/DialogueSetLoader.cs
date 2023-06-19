@@ -192,7 +192,7 @@ namespace Cameo
                    
                     if (DialogueMultiMediaPlayer.isImage(obj.BGImage))
                     {
-                        Debug.Log("下載對話背景圖片:" + obj.BGImage);
+//                        Debug.Log("下載對話背景圖片:" + obj.BGImage);
                          imageURL.Add(obj.BGImage);
                     }
                         
