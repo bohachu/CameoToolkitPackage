@@ -347,7 +347,8 @@ public class Page_BTNMenuPage : BasePage
     }
     void ActiveDisactiveAllBTNs(bool isActive)
     {
-        Button_Return.enabled = isActive;
+        if (Button_Return != null)
+            Button_Return.enabled = isActive;
         foreach (var obj in buttons)
         {
             obj.button.enabled = isActive;

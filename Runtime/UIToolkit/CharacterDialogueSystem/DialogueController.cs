@@ -388,7 +388,7 @@ public class DialogueController : MonoBehaviour
     }
     public void Reset()
     {
-        Debug.Log("Reset");
+//        Debug.Log("Reset");
         BGImage.sprite = null;
         BGImage.gameObject.SetActive(false);
         CenterImage.sprite = null;
@@ -480,9 +480,9 @@ public class DialogueController : MonoBehaviour
         if(dialogueActionUnit.IsBGChange)
         {
             
-            Debug.Log("BGChange:"+dialogueActionUnit.BGImage+","+dialogueActionUnit.originData.BGImage);
+          //  Debug.Log("BGChange:"+dialogueActionUnit.BGImage+","+dialogueActionUnit.originData.BGImage);
             BGImage.sprite = dialogueActionUnit.BGImage;
-             Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
+          //   Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
             if (dialogueActionUnit.BGImage != null)
             {
                 BGImage.gameObject.SetActive(true);
@@ -493,7 +493,7 @@ public class DialogueController : MonoBehaviour
             }
           
             //BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
-             Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
+           //  Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
              
         }
         if (dialogueActionUnit.IsCenterImgChange)
