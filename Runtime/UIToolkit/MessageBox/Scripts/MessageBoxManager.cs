@@ -14,12 +14,13 @@ namespace Cameo.UI
         public Color BackgroundColor = Color.black;
 
         public Action OnAllMessageBoxClosed=new Action(() => { });
-         public Action OnAnyMessageBoxOpened=new Action(() => { });
         private RectTransform rectTran;
         private List<BaseMessageBox> curOpendMessageBoxs = new List<BaseMessageBox>();
         private BaseMessageBox curMsgBox = null;
         private Dictionary<string, object> paramMapping;
         private Dictionary<string, BaseMessageBox> msgBoxInfoMap;
+        public Action OnAnyMessageBoxOpened=new Action(() => { });
+        public Action OnAnyMessageBoxClosed=new Action(() => { });
         public BaseMessageBox ShowComfirmBox(string msg, UnityEngine.Events.UnityAction onClick, UnityEngine.Events.UnityAction OnCancel = null,bool isUseBackground=true)
         {
             Dictionary<string, object> paramMap = new Dictionary<string, object>();
@@ -37,6 +38,7 @@ namespace Cameo.UI
         }
         void Awake()
         {
+            
             OnAllMessageBoxClosed=new Action(() => { });
             rectTran = GetComponent<RectTransform>();
             BackgroundOnOff(false);
@@ -51,6 +53,7 @@ namespace Cameo.UI
         {
             CancelInvoke("AfterCloseBoxShowNextBox");
         }
+        
         public BaseMessageBox ShowMessageBox(string TypeName, Dictionary<string, object> dicParams = null, bool isUseBackground = true)
         {
             curMsgBox = msgBoxInfoMap[TypeName];
@@ -63,6 +66,7 @@ namespace Cameo.UI
         }
         public BaseMessageBox ShowMessageBox(BaseMessageBox boxPrefab,Dictionary<string, object> dicParams = null, bool isUseBackground = true)
         {
+            OnAnyMessageBoxOpened();
             Background.raycastTarget = true;
 
             paramMapping = dicParams;
@@ -100,7 +104,7 @@ namespace Cameo.UI
                 onFadeInFinished();
             }
             messageBox.transform.SetAsLastSibling();
-         
+
             return messageBox;
         }
         public void SetBoxOrder(BaseMessageBox messageBox)
@@ -119,7 +123,6 @@ namespace Cameo.UI
                     curOpendMessageBoxs[i].Open(this);
                 }
             }
-            OnAnyMessageBoxOpened();
         }
 
         public void CloseAllOpenedBoxWithoutInvokeClosedFunc()
@@ -142,6 +145,7 @@ namespace Cameo.UI
         }
           public void OnMessageBoxClosed(BaseMessageBox msgBox)
 		{
+            OnAnyMessageBoxClosed();
 			curOpendMessageBoxs.Remove (msgBox);
 			Destroy (msgBox.gameObject);
 
