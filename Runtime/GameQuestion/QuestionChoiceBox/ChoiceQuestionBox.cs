@@ -127,7 +127,7 @@ namespace Cameo.QuestionGame
         }
         bool isCorrect(List<int> Answers)
         {
-            return Answers.Contains(index);
+            return Answers.Contains(index+1);
         }
     }
     public class ChoiceQuestionBox : BaseMessageBox
