@@ -132,6 +132,9 @@ public class UI_BTNPageDataLoader : MonoBehaviour
     }
     async Task LoadBTNData(string BTNDtataSheetID)
     {
+
+        try
+        {
         var downloadIndex = DownloadInfoManager.Instance.DownloadInfo(BTNDtataSheetID);
         if (downloadIndex == null)
         {
@@ -146,8 +149,6 @@ public class UI_BTNPageDataLoader : MonoBehaviour
                 FastAPISettings.SpreadSheetKey, SpreadSheet,
                 FastAPISettings.WorkSheetKey, WorkSheet);
 
-        try
-        {
             string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
 //            Debug.Log(jsonStr);
             btnDatas = JsonConvert.DeserializeObject<List<BTNData>>(jsonStr);
@@ -156,8 +157,8 @@ public class UI_BTNPageDataLoader : MonoBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.LogError("後台有問題：可能是index上稿錯誤");
-            Debug.LogError(url);
+            Debug.LogError("LoadBTNData:後台有問題：可能是index上稿錯誤，找不到BTNID SHeet:"+BTNDtataSheetID);
+           // Debug.LogError(url);
             Debug.LogError(e);
         }
        // return new List<BTNData>();

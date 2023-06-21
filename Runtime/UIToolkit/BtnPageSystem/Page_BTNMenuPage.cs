@@ -345,14 +345,26 @@ public class Page_BTNMenuPage : BasePage
         }
         
     }
+ 
     void ActiveDisactiveAllBTNs(bool isActive)
     {
+        if(isActive)
+        {
+            //如果是啟動按鈕，則要重新設定按鈕狀態
+            SetupMissionData(UI_BTNDataManager.Instance.GetMissionData(BTNMenuUniqueID));
+             SetupBTNUI();
+        }
+        else
+        {
+            //如果是關閉按鈕，則要先關閉所有按鈕
+            foreach (var obj in buttons)
+            {
+                obj.button.enabled = isActive;
+            }
+        }
         if (Button_Return != null)
             Button_Return.enabled = isActive;
-        foreach (var obj in buttons)
-        {
-            obj.button.enabled = isActive;
-        }
+      
     }
     public override void OnOpen()
     {
