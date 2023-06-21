@@ -388,13 +388,19 @@ public class DialogueController : MonoBehaviour
     }
     public void Reset()
     {
-//        Debug.Log("Reset");
+        Debug.Log("Reset");
         BGImage.sprite = null;
         BGImage.gameObject.SetActive(false);
         CenterImage.sprite = null;
         CenterImage.gameObject.SetActive(false);
-        BGMediaPlayer.Reset();
-        CenterMediaPlayer.Reset();
+        if(BGMediaPlayer!=null)
+        {
+            BGMediaPlayer.Reset();
+        }
+        if(CenterMediaPlayer!=null)
+        {
+            CenterMediaPlayer.Reset();
+        }
     }
 
     public void ShowHideDialogue(bool isShow)
@@ -417,9 +423,14 @@ public class DialogueController : MonoBehaviour
               CenterImage.gameObject.SetActive(false);
         }
        
-       
-        BGMediaPlayer.IsShow(isShow);
-        CenterMediaPlayer.IsShow(isShow);
+       if(BGMediaPlayer!=null)
+        {
+            BGMediaPlayer.IsShow(isShow);
+        }
+        if(CenterMediaPlayer!=null)
+        {
+            CenterMediaPlayer.IsShow(isShow);
+        }
         //dialogueBTN.gameObject.SetActive(isShow);
 
     }
@@ -480,9 +491,9 @@ public class DialogueController : MonoBehaviour
         if(dialogueActionUnit.IsBGChange)
         {
             
-          //  Debug.Log("BGChange:"+dialogueActionUnit.BGImage+","+dialogueActionUnit.originData.BGImage);
+            Debug.Log("BGChange:"+dialogueActionUnit.BGImage+","+dialogueActionUnit.originData.BGImage);
             BGImage.sprite = dialogueActionUnit.BGImage;
-          //   Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
+             Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
             if (dialogueActionUnit.BGImage != null)
             {
                 BGImage.gameObject.SetActive(true);
@@ -493,7 +504,7 @@ public class DialogueController : MonoBehaviour
             }
           
             //BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
-           //  Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
+             Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
              
         }
         if (dialogueActionUnit.IsCenterImgChange)
