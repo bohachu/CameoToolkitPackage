@@ -127,7 +127,7 @@ namespace Cameo.QuestionGame
         }
         bool isCorrect(List<int> Answers)
         {
-            return Answers.Contains(index+1);
+            return Answers.Contains((index+1)); //注意，答案從1開始
         }
     }
     public class ChoiceQuestionBox : BaseMessageBox
@@ -257,7 +257,7 @@ namespace Cameo.QuestionGame
 
             //先取消自動關閉，等待玩家按下關閉按鈕
             closeButton.gameObject.SetActive(true);
-            StartCoroutine(WaitTimeClose(2));
+            StartCoroutine(WaitTimeClose(5));
             
             OnAnswered.Invoke();
         }
