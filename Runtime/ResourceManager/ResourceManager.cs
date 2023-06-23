@@ -115,7 +115,8 @@ namespace Cameo
                 AddressDef curAdd = new AddressDef();
                 curAdd.Address = address[i];
                 curAdd.Type = AssetTypeEnum.Texture2D;
-                yield return StartCoroutine(loadAssetCoroutine<Sprite>(curAdd));
+                if (!assetPool.ContainsKey(curAdd.Address))
+                    yield return StartCoroutine(loadAssetCoroutine<Sprite>(curAdd));
                 LoadingProgress = i / address.Count;
             }
             if (onCompleted != null)
