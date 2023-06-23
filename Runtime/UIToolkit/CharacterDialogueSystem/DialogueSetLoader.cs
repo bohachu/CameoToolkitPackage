@@ -52,6 +52,7 @@ namespace Cameo
                 var oneDialogue = new DialogueActionUnit(obj);
                 oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
                 //遇到hide指令，就把圖片清空
+               
                 if (obj.BGImage.EndsWith(PresetImageCommand.Hide.ToString()))
                 {
                     oneDialogue.BGImage = null;
@@ -131,15 +132,14 @@ namespace Cameo
             {
 
                 string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
-  //              Debug.Log("下載對白資料成功");
-//                Debug.Log(jsonStr);
+                //Debug.Log("下載對白資料成功");
+                //Debug.Log(jsonStr);
                 dialogDatas = JsonConvert.DeserializeObject<List<DialogData>>(jsonStr);
                 ConvertAllURL();
             }
             catch (System.Exception e)
             {
-                Debug.LogError("下載對白資料失敗");
-                Debug.LogError(url);
+                Debug.LogError("下載對白資料失敗："+url);
                 Debug.LogError(e);
             }
         }
@@ -147,9 +147,12 @@ namespace Cameo
         {
             foreach (var obj in dialogDatas)
             {
-                obj.Audio = ConvertRouterURL(obj.Audio);
-                obj.BGImage = ConvertRouterURL(obj.BGImage);
-                obj.CenterImage = ConvertRouterURL(obj.CenterImage);
+                if(obj.Audio!=null)
+                    obj.Audio = ConvertRouterURL(obj.Audio);
+                if(obj.BGImage!=null)
+                    obj.BGImage = ConvertRouterURL(obj.BGImage);
+                if(obj.CenterImage!=null)
+                    obj.CenterImage = ConvertRouterURL(obj.CenterImage);
             }
         }
         string ConvertRouterURL(string url)
@@ -192,7 +195,7 @@ namespace Cameo
                    
                     if (DialogueMultiMediaPlayer.isImage(obj.BGImage))
                     {
-//                        Debug.Log("下載對話背景圖片:" + obj.BGImage);
+                        Debug.Log("下載對話背景圖片:" + obj.BGImage);
                          imageURL.Add(obj.BGImage);
                     }
                         
