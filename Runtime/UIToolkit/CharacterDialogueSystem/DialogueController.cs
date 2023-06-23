@@ -355,13 +355,17 @@ public class DialogueController : MonoBehaviour
         //if (preExpression == characterExpression) return;
         preExpression = characterExpression;
         int characterIndex = (int)characterExpression;
+        CharacterImg.enabled = true;
         if (characterExpression == CharacterExpression.Player)
         {
-            CharacterImg.sprite = PlayerSet.CharacterImg;
+            if(PlayerSet.CharacterImg!=null)
+                CharacterImg.sprite = PlayerSet.CharacterImg;
+            else CharacterImg.enabled = false;
             CharacterName.text = PlayerSet.CharacterName;
         }
         else
         {
+            
             CharacterImg.sprite = CharacterSets[characterIndex].CharacterImg;
             CharacterName.text = CharacterSets[characterIndex].CharacterName;
         }
@@ -523,7 +527,7 @@ public class DialogueController : MonoBehaviour
                 CenterImage.gameObject.SetActive(false);
             }
             //如果是影片或是iframe則播放
-            Debug.Log("CenterImgChange 播放影片或是iframe:" + dialogueActionUnit.originData.CenterImage);
+//            Debug.Log("CenterImgChange 播放影片或是iframe:" + dialogueActionUnit.originData.CenterImage);
             if(CenterMediaPlayer!=null)
                 CenterMediaPlayer.PlayMedia(dialogueActionUnit.originData.CenterImage);
             
