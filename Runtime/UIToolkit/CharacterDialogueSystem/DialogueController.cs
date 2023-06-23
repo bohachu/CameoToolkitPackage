@@ -502,8 +502,10 @@ public class DialogueController : MonoBehaviour
             {
                 BGImage.gameObject.SetActive(false);
             }
-          
-            //BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
+            if(BGMediaPlayer!=null)
+            {
+                BGMediaPlayer.PlayMedia(dialogueActionUnit.originData.BGImage);
+            }
              Debug.Log("BGChange done :"+dialogueActionUnit.BGImage);
              
         }
@@ -522,7 +524,8 @@ public class DialogueController : MonoBehaviour
             }
             //如果是影片或是iframe則播放
             Debug.Log("CenterImgChange 播放影片或是iframe:" + dialogueActionUnit.originData.CenterImage);
-            CenterMediaPlayer.PlayMedia(dialogueActionUnit.originData.CenterImage);
+            if(CenterMediaPlayer!=null)
+                CenterMediaPlayer.PlayMedia(dialogueActionUnit.originData.CenterImage);
             
         }
         if (dialogueActionUnit.IsAudioEnable)
