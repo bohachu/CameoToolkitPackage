@@ -19,6 +19,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
     public List<LancherSelector> LancherSelectors;
     UI_BTNLancherBase GetLancher(string LancherName)
     {
+       // Debug.Log("判斷 GetLancher:"+LancherName);
         foreach (var item in LancherSelectors)
         {
             if(item.LancherName==LancherName)
@@ -27,7 +28,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             }
             
         }
-        Debug.LogError("找不到LancherName:"+LancherName);
+//        Debug.LogError("找不到LancherName:"+LancherName);
         return null;
     }
 
@@ -71,7 +72,6 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
                 continue; //如果是鎖定的，就不用設定圖案了
             }
             
-            
             int score = curBtnState.Score;
             //判斷目前score最接近的scoreIconCOndition是哪一個
             Debug.Log("設定ＵＩ by score:" + score+" , "+obj.bntID);
@@ -102,7 +102,12 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
          for(int i=0;i< BTNData.Count; i++)
         {
              var eachExtraParam = JsonConvert.DeserializeObject<ExtraParamStruct>(BTNData[i].ExtraParam);
-            buttons[i].btnLuncher= GetLancher(eachExtraParam.GameLauncher);
+             Debug.Log(BTNData[i].BTNID+","+BTNData[i].Desc+"SetupLancher:"+eachExtraParam.GameLauncher);
+            var lancher = GetLancher(eachExtraParam.GameLauncher);
+            if(lancher!=null)
+            {
+                 buttons[i].btnLuncher = lancher;
+            }
         }
     }
 
@@ -148,8 +153,8 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
                     Application.OpenURL(outUrl);
                 });
             }
-           
         }
+        SetupLancher();
 
     }
     //專為高中英文設計的上稿內容，增加了，地圖圖片，以及書籍連結。
