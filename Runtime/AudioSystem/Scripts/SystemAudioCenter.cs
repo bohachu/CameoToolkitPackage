@@ -50,6 +50,7 @@ namespace Cameo
             }
             StartCoroutine(LoopPlay(clipType));
         }
+        
         bool IsLoopPlay = false;
         IEnumerator LoopPlay(AudioClipType clipType)
         {
@@ -66,7 +67,18 @@ namespace Cameo
             IsLoopPlay = false;
         }
 
-
+        public void PlayOneShot(string clipName)
+        {
+            foreach (AudioTextDef audioTextDef in audioTextDefs)
+            {
+                if (audioTextDef.Def == clipName)
+                {
+                    audioSource.PlayOneShot(audioTextDef.Clip);
+                    return;
+                }
+            }
+           
+        }
         int errorCount = 0;
         public void PlayOneShot(AudioClipType clipType)
         {
