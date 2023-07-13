@@ -19,7 +19,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
     public List<LancherSelector> LancherSelectors;
     UI_BTNLancherBase GetLancher(string LancherName)
     {
-       // Debug.Log("判斷 GetLancher:"+LancherName);
+        //Debug.Log("判斷 GetLancher:"+LancherName);
         foreach (var item in LancherSelectors)
         {
             if(item.LancherName==LancherName)
@@ -102,7 +102,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
          for(int i=0;i< BTNData.Count; i++)
         {
              var eachExtraParam = JsonConvert.DeserializeObject<ExtraParamStruct>(BTNData[i].ExtraParam);
-             Debug.Log(BTNData[i].BTNID+","+BTNData[i].Desc+"SetupLancher:"+eachExtraParam.GameLauncher);
+             Debug.Log(BTNData[i].BTNID+","+BTNData[i].Desc+"SetupLancher:"+eachExtraParam.GameLauncher+" , raw data : "+BTNData[i].ExtraParam);
             var lancher = GetLancher(eachExtraParam.GameLauncher);
             if(lancher!=null)
             {

@@ -279,6 +279,8 @@ public class Page_BTNMenuPage : BasePage
                         gameLancher = null;
                     }
                     gameLancher = Instantiate<UI_BTNLancherBase>(obj.btnLuncher);
+                    gameLancher.transform.parent=transform;
+                    gameLancher.transform.localScale = Vector3.one;
                     StartCoroutine(gameLancher.LanchProcess(obj.bntData,(ScoreResult value)=> {
                         //如果有填寫PageID, 則會啟動換頁，不會進入遊戲，沒有則是完成體驗，解鎖下一個按鈕
                         if (!string.IsNullOrEmpty(obj.PageID))
