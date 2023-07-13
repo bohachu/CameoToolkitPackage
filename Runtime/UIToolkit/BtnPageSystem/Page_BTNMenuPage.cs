@@ -229,7 +229,7 @@ public class Page_BTNMenuPage : BasePage
     }
 
     protected PlayerMissionState playerMissionState;
-
+    UI_BTNLancherBase gameLancher = null;//目前開啟的遊戲啟動器，需要關卡按鈕被點選的時候實體化，遊戲結束時刪除
 
     public virtual void SetupBTNUI()
     {
@@ -273,7 +273,13 @@ public class Page_BTNMenuPage : BasePage
                 {
                     Debug.Log("啟動："+ obj.bntID+","+obj.PageID);
                     //如果有LancherProcess, 則會執行，沒有則略過
-                    StartCoroutine(obj.btnLuncher.LanchProcess(obj.bntData,(ScoreResult value)=> {
+                    if(gameLancher!=null)
+                    {
+                        Destroy(gameLancher.gameObject);
+                        gameLancher = null;
+                    }
+                    gameLancher = Instantiate<UI_BTNLancherBase>(obj.btnLuncher);
+                    StartCoroutine(gameLancher.LanchProcess(obj.bntData,(ScoreResult value)=> {
                         //如果有填寫PageID, 則會啟動換頁，不會進入遊戲，沒有則是完成體驗，解鎖下一個按鈕
                         if (!string.IsNullOrEmpty(obj.PageID))
                         {
@@ -287,6 +293,8 @@ public class Page_BTNMenuPage : BasePage
                             ActiveDisactiveAllBTNs(true);
                             MissionDoneUnlockNextBTN(value);
                         }
+                        Destroy(gameLancher.gameObject);
+                        gameLancher=null;
                     } ,
                         UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
                         () => {
