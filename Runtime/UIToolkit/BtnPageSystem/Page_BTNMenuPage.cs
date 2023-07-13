@@ -235,7 +235,7 @@ public class Page_BTNMenuPage : BasePage
         if (gameLancher != null)
         {
             Debug.Log("刪除遊戲啟動器 Lancher:"+gameLancher.gameObject.name);
-            Destroy(gameLancher.gameObject);
+            DestroyImmediate(gameLancher.gameObject);
             gameLancher = null;
         }
     }
@@ -287,13 +287,8 @@ public class Page_BTNMenuPage : BasePage
                         gameLancher = null;
                     }
                     gameLancher = Instantiate<UI_BTNLancherBase>(obj.btnLuncher);
-                    gameLancher.transform.parent=transform;
-                    gameLancher.transform.localScale = Vector3.one;
-                    var rec =gameLancher.GetComponent<RectTransform>();
-                        rec.localPosition = Vector3.zero;
-                    rec.sizeDelta = new Vector2(100f, 100f);
-                    rec.anchorMin = new Vector2(0.5f, 0.5f);
-                    rec.anchorMax = new Vector2(0.5f, 0.5f);
+                    gameLancher.GetComponent<RectTransform>().SetParent(transform, false);
+              
                     StartCoroutine(gameLancher.LanchProcess(obj.bntData,(ScoreResult value)=> {
                         Debug.Log("遊戲結束1");
 
@@ -314,7 +309,8 @@ public class Page_BTNMenuPage : BasePage
                             MissionDoneUnlockNextBTN(value);
                         }
                           Debug.Log("遊戲結束5");
-                        Invoke("ClearLancher", 1.5f);
+                        //  ClearLancher();
+                       // Invoke("ClearLancher", 1.5f);
                         Debug.Log("遊戲結束6");
                     } ,
                         UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
