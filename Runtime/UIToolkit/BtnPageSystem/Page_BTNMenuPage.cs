@@ -230,7 +230,15 @@ public class Page_BTNMenuPage : BasePage
 
     protected PlayerMissionState playerMissionState;
     UI_BTNLancherBase gameLancher = null;//目前開啟的遊戲啟動器，需要關卡按鈕被點選的時候實體化，遊戲結束時刪除
-
+    void ClearLancher()
+    {
+        if (gameLancher != null)
+        {
+            Debug.Log("刪除遊戲啟動器 Lancher:"+gameLancher.gameObject.name);
+            Destroy(gameLancher.gameObject);
+            gameLancher = null;
+        }
+    }
     public virtual void SetupBTNUI()
     {
         // prepare btn click to lancher
@@ -282,21 +290,27 @@ public class Page_BTNMenuPage : BasePage
                     gameLancher.transform.parent=transform;
                     gameLancher.transform.localScale = Vector3.one;
                     StartCoroutine(gameLancher.LanchProcess(obj.bntData,(ScoreResult value)=> {
+                        Debug.Log("遊戲結束1");
+
                         //如果有填寫PageID, 則會啟動換頁，不會進入遊戲，沒有則是完成體驗，解鎖下一個按鈕
                         if (!string.IsNullOrEmpty(obj.PageID))
                         {
                             //如果有填寫PageID, 則會啟動換頁，不會進入遊戲
+                             Debug.Log("遊戲結束2");
                             pageManager.SwitchTo(obj.PageID, false, CreateParam(obj.bntData));
                         }
                         else
                         {
+                             Debug.Log("遊戲結束3");
                             //沒有pageID 所以是啟動遊戲模組已經成功完成體驗了
                             //遊戲成功後，顯示本次選單頁面，並解鎖下一個按鈕
                             ActiveDisactiveAllBTNs(true);
+                              Debug.Log("遊戲結束4");
                             MissionDoneUnlockNextBTN(value);
                         }
-                        Destroy(gameLancher.gameObject);
-                        gameLancher=null;
+                          Debug.Log("遊戲結束5");
+                        Invoke("ClearLancher", 1.5f);
+                        Debug.Log("遊戲結束6");
                     } ,
                         UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
                         () => {
@@ -419,10 +433,8 @@ public class Page_BTNMenuPage : BasePage
                 //沒有下一個按鈕ＩＤ了，全部任務完成，要解鎖上一層menu的BTNID，顯示成功提示並且關閉本頁，回到上一頁
                 var State = playerMissionState.GetStateByID(result.ID);
                 State.isDone = true;
-                playerMissionState.SetBtnLockByState(ref buttons);
-                UploadMissionState();
-                Debug.Log("All mission done");
-                return;
+              
+                Debug.Log("All mission done，完全過關");
             }
             else
             {
@@ -430,11 +442,12 @@ public class Page_BTNMenuPage : BasePage
                 var nextState = playerMissionState.GetStateByID(NextBTNID);
                 nextState.isLock = false;
             }
-           
+           Debug.Log("遊戲結束10");
         }
         playerMissionState.SetBtnLockByState(ref buttons);
         UploadMissionState();
         SetupBTNUI();
+        Debug.Log("關卡解鎖完成");
     }
 
     //資料設定
