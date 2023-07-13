@@ -289,6 +289,11 @@ public class Page_BTNMenuPage : BasePage
                     gameLancher = Instantiate<UI_BTNLancherBase>(obj.btnLuncher);
                     gameLancher.transform.parent=transform;
                     gameLancher.transform.localScale = Vector3.one;
+                    var rec =gameLancher.GetComponent<RectTransform>();
+                        rec.localPosition = Vector3.zero;
+                    rec.sizeDelta = new Vector2(100f, 100f);
+                    rec.anchorMin = new Vector2(0.5f, 0.5f);
+                    rec.anchorMax = new Vector2(0.5f, 0.5f);
                     StartCoroutine(gameLancher.LanchProcess(obj.bntData,(ScoreResult value)=> {
                         Debug.Log("遊戲結束1");
 
