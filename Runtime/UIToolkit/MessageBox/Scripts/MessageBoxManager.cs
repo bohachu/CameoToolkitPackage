@@ -68,7 +68,6 @@ namespace Cameo.UI
         {
             OnAnyMessageBoxOpened();
             Background.raycastTarget = true;
-
             paramMapping = dicParams;
 
             GameObject msgBox = Instantiate(boxPrefab.gameObject);
@@ -127,10 +126,16 @@ namespace Cameo.UI
 
         public void CloseAllOpenedBoxWithoutInvokeClosedFunc()
         {
+            if(curOpendMessageBoxs.Count == 0)
+            {
+                BackgroundOnOff(false);
+                return;
+            }
             for(int i=curOpendMessageBoxs.Count - 1; i >= 0; --i)
             {
                 curOpendMessageBoxs[i].Close(false);
             }
+
         }
         bool isBackgroundFadable()
         {
@@ -145,14 +150,17 @@ namespace Cameo.UI
         }
           public void OnMessageBoxClosed(BaseMessageBox msgBox)
 		{
+            Debug.Log("1 開始關閉MessageBox");
             OnAnyMessageBoxClosed();
 			curOpendMessageBoxs.Remove (msgBox);
 			Destroy (msgBox.gameObject);
-
+             Debug.Log("2消滅MessageBox");
 			if (isBackgroundFadable()) 
 			{
+
+                Debug.Log("3Message灰色背景開始消失");
                 LeanTween.value(gameObject, BackgroundColor, new Color(0, 0, 0, 0), FadeTime).setOnUpdateColor(updateColor);
-                Invoke ("AfterCloseBoxShowNextBox", FadeTime);
+                Invoke ("4AfterCloseBoxShowNextBox", FadeTime);
 			}
             else
             {
@@ -162,6 +170,7 @@ namespace Cameo.UI
         }
         void AfterCloseBoxShowNextBox()
         {
+             Debug.Log("5重新排列MessageBox");
             if (curOpendMessageBoxs.Count > 0)
             {
                 Background.rectTransform.SetAsLastSibling();
@@ -170,8 +179,10 @@ namespace Cameo.UI
             if (curOpendMessageBoxs.Count == 0)
             {
                 BackgroundOnOff(false);
+                 Debug.Log("6所有的MessageBox都關閉了");
                 OnAllMessageBoxClosed();
             }
+             Debug.Log("7完成關閉MessageBox");
         }
 
         private void updateColor(Color color)
