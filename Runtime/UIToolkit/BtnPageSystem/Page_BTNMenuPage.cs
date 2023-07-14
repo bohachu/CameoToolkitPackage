@@ -270,10 +270,11 @@ public class Page_BTNMenuPage : BasePage
                     gameLancher.GetComponent<RectTransform>().SetParent(transform, false);
               
                     StartCoroutine(gameLancher.LanchProcess(obj.bntData,(ScoreResult value)=> {
-                        
+                        Debug.Log("遊戲結束，執行OnMissionDone：");
                         //如果有填寫PageID, 則會啟動換頁，不會進入遊戲，沒有則是完成體驗，解鎖下一個按鈕
                         if (!string.IsNullOrEmpty(obj.PageID))
                         {
+                             Debug.Log("啟動換頁："+ obj.PageID);
                             //如果有填寫PageID, 則會啟動換頁，不會進入遊戲
                             pageManager.SwitchTo(obj.PageID, false, CreateParam(obj.bntData));
                         }
@@ -281,12 +282,12 @@ public class Page_BTNMenuPage : BasePage
                         {
                             //沒有pageID 所以是啟動遊戲模組已經成功完成體驗了
                             //遊戲成功後，顯示本次選單頁面，並解鎖下一個按鈕
-                           
-                            MissionDoneUnlockNextBTN(value);
-                            ActiveDisactiveAllBTNs(true);
-                            Debug.Log("完成遊戲，將所有按鈕開啟");
+                              Debug.Log("完成遊戲，將所有按鈕開啟");
+                                ActiveDisactiveAllBTNs(true);
+                                MissionDoneUnlockNextBTN(value);
                         }
-                        
+                     
+                           
                         Invoke("ClearLancher", 0.2f);
                     } ,
                         UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
@@ -308,6 +309,7 @@ public class Page_BTNMenuPage : BasePage
     public virtual void SetupBTNUI()
     {
         // prepare btn click to lancher
+        Debug.Log("Setup base BTNUI");
         foreach (var obj in buttons)
         {
             if(obj.UnLockBtn!=null)

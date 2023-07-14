@@ -162,7 +162,7 @@ namespace Cameo.UI
 
                 Debug.Log("3 Message灰色背景開始消失");
                 LeanTween.value(gameObject, BackgroundColor, new Color(0, 0, 0, 0), FadeTime).setOnUpdateColor(updateColor);
-                Invoke ("4AfterCloseBoxShowNextBox", FadeTime);
+                Invoke ("AfterCloseBoxShowNextBox", FadeTime);
 			}
             else
             {

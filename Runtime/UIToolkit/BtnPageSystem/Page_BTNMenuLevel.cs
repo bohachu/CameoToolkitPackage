@@ -147,6 +147,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             else
             {
                 ExtraUrlBTN[i].gameObject.SetActive(true);
+                ExtraUrlBTN[i].enabled = true;
                 ExtraUrlBTN[i].onClick.RemoveAllListeners();
                 ExtraUrlBTN[i].onClick.AddListener(() => {
                     Application.OpenURL(outUrl);
