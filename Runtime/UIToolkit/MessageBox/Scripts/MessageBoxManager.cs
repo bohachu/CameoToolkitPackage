@@ -66,6 +66,8 @@ namespace Cameo.UI
         }
         public BaseMessageBox ShowMessageBox(BaseMessageBox boxPrefab,Dictionary<string, object> dicParams = null, bool isUseBackground = true)
         {
+            Debug.Log("1 ShowMessageBox clearNullBox");
+            ClearNullBox();
             OnAnyMessageBoxOpened();
             Background.raycastTarget = true;
             paramMapping = dicParams;
@@ -88,8 +90,9 @@ namespace Cameo.UI
                 curOpendMessageBoxs.Add(messageBox);
 
             }
-
+          
             Background.rectTransform.SetAsLastSibling();
+               Debug.Log("2 BG SetAsLastSibling");
             if (isUseBackground)
             {
                 BackgroundOnOff(true);
@@ -103,7 +106,7 @@ namespace Cameo.UI
                 onFadeInFinished();
             }
             messageBox.transform.SetAsLastSibling();
-
+ Debug.Log("3 show end");
             return messageBox;
         }
         public void SetBoxOrder(BaseMessageBox messageBox)
@@ -127,6 +130,7 @@ namespace Cameo.UI
         public void CloseAllOpenedBoxWithoutInvokeClosedFunc()
         {
            
+           ClearNullBox();
             for(int i=curOpendMessageBoxs.Count - 1; i >= 0; --i)
             {
                 curOpendMessageBoxs[i].Close(false);
@@ -145,8 +149,9 @@ namespace Cameo.UI
             }
             return Background.enabled;
         }
-          public void OnMessageBoxClosed(BaseMessageBox msgBox)
+        public void OnMessageBoxClosed(BaseMessageBox msgBox)
 		{
+            ClearNullBox();
             Debug.Log("1 開始關閉MessageBox");
             OnAnyMessageBoxClosed();
 			curOpendMessageBoxs.Remove (msgBox);
@@ -155,7 +160,7 @@ namespace Cameo.UI
 			if (isBackgroundFadable()) 
 			{
 
-                Debug.Log("3Message灰色背景開始消失");
+                Debug.Log("3 Message灰色背景開始消失");
                 LeanTween.value(gameObject, BackgroundColor, new Color(0, 0, 0, 0), FadeTime).setOnUpdateColor(updateColor);
                 Invoke ("4AfterCloseBoxShowNextBox", FadeTime);
 			}
@@ -163,14 +168,36 @@ namespace Cameo.UI
             {
                 AfterCloseBoxShowNextBox();
             }
-           
+            Debug.Log("6 關閉視窗完成");
+        }
+        void ClearNullBox()
+        {
+            for (int i = curOpendMessageBoxs.Count - 1; i >= 0; --i)
+            {
+                if (curOpendMessageBoxs[i] == null)
+                {
+                    curOpendMessageBoxs.RemoveAt(i);
+                }
+            }
         }
         void AfterCloseBoxShowNextBox()
         {
+          
              Debug.Log("5重新排列MessageBox");
             if (curOpendMessageBoxs.Count > 0)
             {
+                if(Background==null)
+                {
+                    Debug.LogError("Background==null");
+                }
+
                 Background.rectTransform.SetAsLastSibling();
+
+                if(curOpendMessageBoxs[curOpendMessageBoxs.Count - 1]==null)
+                {
+                    Debug.LogError("curOpendMessageBoxs[curOpendMessageBoxs.Count - 1]==null");
+                }
+                
                 curOpendMessageBoxs[curOpendMessageBoxs.Count - 1].transform.SetAsLastSibling();
             }
             if (curOpendMessageBoxs.Count == 0)
