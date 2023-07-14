@@ -26,7 +26,6 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             {
                 return item.Lancher;
             }
-            
         }
 //        Debug.LogError("找不到LancherName:"+LancherName);
         return null;
@@ -74,7 +73,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             
             int score = curBtnState.Score;
             //判斷目前score最接近的scoreIconCOndition是哪一個
-            Debug.Log("設定ＵＩ by score:" + score+" , "+obj.bntID);
+          //  Debug.Log("設定ＵＩ by score:" + score+" , "+obj.bntID);
             var condition = FindHestestButUnderScoreIconCondition(score);
             if (condition != null)
             {

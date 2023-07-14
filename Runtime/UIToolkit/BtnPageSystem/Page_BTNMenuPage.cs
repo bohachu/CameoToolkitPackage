@@ -239,36 +239,16 @@ public class Page_BTNMenuPage : BasePage
             gameLancher = null;
         }
     }
-    public virtual void SetupBTNUI()
+    BTNUISet curScelectedBTN = null;
+    void OnLancherClick()
     {
-        // prepare btn click to lancher
-        foreach (var obj in buttons)
+        if(curScelectedBTN==null)
         {
-            if(obj.UnLockBtn!=null)
-            {
-                obj.UnLockBtn.onClick.RemoveAllListeners();
-                obj.UnLockBtn.onClick.AddListener(() =>
-                {
-                    if(paymentBox==null)
-                    {
-                        Debug.LogError("找不到payment box");
-                    }
-                    else
-                    {
-                        paymentBox.ShowPaymentBox(() =>
-                        {
-                        UnlockBTN(obj.bntID);
-                        Debug.Log("付費解鎖成功:"+obj.bntID+","+obj.bntData.Name);
-                        });
-                    }
-                });
-            }
-                
-            if (obj.btnLuncher == null) obj.btnLuncher = DefaultLancher;
-            obj.button.onClick.RemoveAllListeners();
-            obj.button.onClick.AddListener(() =>
-            {
-                bool isFirstPlay = false;
+            Debug.LogError("沒有選擇任何按鈕，無法啟動遊戲");
+            return;
+        }
+        var obj=curScelectedBTN;
+        bool isFirstPlay = false;
                 var missionData = UI_BTNDataManager.Instance.GetMissionData(BTNMenuUniqueID, obj.bntID);
                 if(missionData==null)
                 {
@@ -301,10 +281,12 @@ public class Page_BTNMenuPage : BasePage
                         {
                             //沒有pageID 所以是啟動遊戲模組已經成功完成體驗了
                             //遊戲成功後，顯示本次選單頁面，並解鎖下一個按鈕
-                            ActiveDisactiveAllBTNs(true);
+                           
                             MissionDoneUnlockNextBTN(value);
+                            ActiveDisactiveAllBTNs(true);
+                            Debug.Log("完成遊戲，將所有按鈕開啟");
                         }
-                       
+                        
                         Invoke("ClearLancher", 0.2f);
                     } ,
                         UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
@@ -321,16 +303,61 @@ public class Page_BTNMenuPage : BasePage
                 
                 SystemAudioCenter.Instance.PlayOneShot(AudioClipType.CommonUIButton);
                    
+    }
+    
+    public virtual void SetupBTNUI()
+    {
+        // prepare btn click to lancher
+        foreach (var obj in buttons)
+        {
+            if(obj.UnLockBtn!=null)
+            {
+                obj.UnLockBtn.onClick.RemoveAllListeners();
+                obj.UnLockBtn.onClick.AddListener(() =>
+                {
+                    if(paymentBox==null)
+                    {
+                        Debug.LogError("找不到payment box");
+                    }
+                    else
+                    {
+                        paymentBox.ShowPaymentBox(() =>
+                        {
+                        UnlockBTN(obj.bntID);
+                        Debug.Log("付費解鎖成功:"+obj.bntID+","+obj.bntData.Name);
+                        });
+                    }
+                });
+            }
+                
+            if (obj.btnLuncher == null) obj.btnLuncher = DefaultLancher;
+            obj.button.onClick.RemoveAllListeners();
+            obj.button.onClick.AddListener(() =>
+            {
+                try
+                {
+                    curScelectedBTN = obj;
+                    OnLancherClick();
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError("遊戲過程有問題："+ex.Message + "\n" + ex.StackTrace);
+                    Debug.Log("應變措施，關閉所有messagebox");
+                    MessageBoxManager.Instance.CloseAllOpenedBoxWithoutInvokeClosedFunc();
+                }
+                   
             });
         }
         if (Button_Return != null)
         {
+            Debug.Log("Button_Return 設定回上一頁");
             Button_Return.onClick.RemoveAllListeners();
             Button_Return.onClick.AddListener(() =>
             {
                 //回到上一頁
                 pageManager.ToPrev();
             });
+            Button_Return.enabled = true;
         }
     }
     Dictionary<string,object> CreateParam(BTNData curBTNData)
@@ -367,6 +394,7 @@ public class Page_BTNMenuPage : BasePage
  
     void ActiveDisactiveAllBTNs(bool isActive)
     {
+        Debug.Log("將所有按鈕都 開或關 ActiveDisactiveAllBTNs:" + isActive);
         if(isActive)
         {
             //如果是啟動按鈕，則要重新設定按鈕狀態
