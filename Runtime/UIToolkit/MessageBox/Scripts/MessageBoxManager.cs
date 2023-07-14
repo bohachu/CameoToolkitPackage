@@ -126,15 +126,12 @@ namespace Cameo.UI
 
         public void CloseAllOpenedBoxWithoutInvokeClosedFunc()
         {
-            if(curOpendMessageBoxs.Count == 0)
-            {
-                BackgroundOnOff(false);
-                return;
-            }
+           
             for(int i=curOpendMessageBoxs.Count - 1; i >= 0; --i)
             {
                 curOpendMessageBoxs[i].Close(false);
             }
+             BackgroundOnOff(false);
 
         }
         bool isBackgroundFadable()
