@@ -309,7 +309,7 @@ public class Page_BTNMenuPage : BasePage
     public virtual void SetupBTNUI()
     {
         // prepare btn click to lancher
-        Debug.Log("Setup base BTNUI");
+//        Debug.Log("Setup base BTNUI");
         foreach (var obj in buttons)
         {
             if(obj.UnLockBtn!=null)
@@ -352,7 +352,7 @@ public class Page_BTNMenuPage : BasePage
         }
         if (Button_Return != null)
         {
-            Debug.Log("Button_Return 設定回上一頁");
+//            Debug.Log("Button_Return 設定回上一頁");
             Button_Return.onClick.RemoveAllListeners();
             Button_Return.onClick.AddListener(() =>
             {

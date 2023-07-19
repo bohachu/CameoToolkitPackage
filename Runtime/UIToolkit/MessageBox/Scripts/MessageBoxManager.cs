@@ -156,7 +156,7 @@ namespace Cameo.UI
             OnAnyMessageBoxClosed();
 			curOpendMessageBoxs.Remove (msgBox);
 			Destroy (msgBox.gameObject);
-             Debug.Log("2消滅MessageBox");
+//             Debug.Log("2消滅MessageBox");
 			if (isBackgroundFadable()) 
 			{
 
