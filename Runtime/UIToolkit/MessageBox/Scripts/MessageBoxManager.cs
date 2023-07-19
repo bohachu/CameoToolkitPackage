@@ -66,7 +66,7 @@ namespace Cameo.UI
         }
         public BaseMessageBox ShowMessageBox(BaseMessageBox boxPrefab,Dictionary<string, object> dicParams = null, bool isUseBackground = true)
         {
-            Debug.Log("1 ShowMessageBox clearNullBox");
+           // Debug.Log("1 ShowMessageBox clearNullBox");
             ClearNullBox();
             OnAnyMessageBoxOpened();
             Background.raycastTarget = true;
@@ -92,7 +92,7 @@ namespace Cameo.UI
             }
           
             Background.rectTransform.SetAsLastSibling();
-               Debug.Log("2 BG SetAsLastSibling");
+               //Debug.Log("2 BG SetAsLastSibling");
             if (isUseBackground)
             {
                 BackgroundOnOff(true);
@@ -106,7 +106,7 @@ namespace Cameo.UI
                 onFadeInFinished();
             }
             messageBox.transform.SetAsLastSibling();
- Debug.Log("3 show end");
+ //Debug.Log("3 show end");
             return messageBox;
         }
         public void SetBoxOrder(BaseMessageBox messageBox)
@@ -152,7 +152,7 @@ namespace Cameo.UI
         public void OnMessageBoxClosed(BaseMessageBox msgBox)
 		{
             ClearNullBox();
-            Debug.Log("1 開始關閉MessageBox");
+          //  Debug.Log("1 開始關閉MessageBox");
             OnAnyMessageBoxClosed();
 			curOpendMessageBoxs.Remove (msgBox);
 			Destroy (msgBox.gameObject);
@@ -160,7 +160,7 @@ namespace Cameo.UI
 			if (isBackgroundFadable()) 
 			{
 
-                Debug.Log("3 Message灰色背景開始消失");
+           //     Debug.Log("3 Message灰色背景開始消失");
                 LeanTween.value(gameObject, BackgroundColor, new Color(0, 0, 0, 0), FadeTime).setOnUpdateColor(updateColor);
                 Invoke ("AfterCloseBoxShowNextBox", FadeTime);
 			}
@@ -168,7 +168,7 @@ namespace Cameo.UI
             {
                 AfterCloseBoxShowNextBox();
             }
-            Debug.Log("6 關閉視窗完成");
+         //   Debug.Log("6 關閉視窗完成");
         }
         void ClearNullBox()
         {
@@ -183,7 +183,7 @@ namespace Cameo.UI
         void AfterCloseBoxShowNextBox()
         {
           
-             Debug.Log("5重新排列MessageBox");
+            // Debug.Log("5重新排列MessageBox");
             if (curOpendMessageBoxs.Count > 0)
             {
                 if(Background==null)
@@ -203,10 +203,10 @@ namespace Cameo.UI
             if (curOpendMessageBoxs.Count == 0)
             {
                 BackgroundOnOff(false);
-                 Debug.Log("6所有的MessageBox都關閉了");
+               //  Debug.Log("6所有的MessageBox都關閉了");
                 OnAllMessageBoxClosed();
             }
-             Debug.Log("7完成關閉MessageBox");
+           //  Debug.Log("7完成關閉MessageBox");
         }
 
         private void updateColor(Color color)
