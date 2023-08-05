@@ -31,7 +31,8 @@ namespace Cameo
         {
             { "UnityEngine.Texture2D", AssetTypeEnum.Texture2D},
             { "Cameo.UI.ConversationData", AssetTypeEnum.Conversation},
-            { "SeedHunter.SpriteMapInfo", AssetTypeEnum.AvatarMapInfo }
+            { "SeedHunter.SpriteMapInfo", AssetTypeEnum.AvatarMapInfo },
+            { "UnityEngine.GameObject", AssetTypeEnum.Prefab }
         };
 
 
@@ -43,7 +44,8 @@ namespace Cameo
     {
         Texture2D = 0,
         Conversation = 1,
-        AvatarMapInfo = 2
+        AvatarMapInfo = 2,
+        Prefab = 3,
     }
 }
 

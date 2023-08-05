@@ -219,7 +219,7 @@ www.certificateHandler = cert;
             else
             {
                 //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
-
+try{
                 JsonData jsonData = JsonMapper.ToObject(www.downloadHandler.text);
 
                 returnArray = new T[jsonData.Count - index];
@@ -229,6 +229,12 @@ www.certificateHandler = cert;
                     T obj = parser(jsonData[i]);
                     returnArray[i - index] = obj;
                 }
+}
+catch(Exception e){
+    Debug.Log("下載資料錯誤error:"+e);
+    Debug.Log("url:"+url);
+    Debug.Log("data:"+www.downloadHandler.text);
+}
             }
             www.Dispose();
             return returnArray;
