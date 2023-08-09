@@ -297,6 +297,8 @@ www.certificateHandler = cert;
 
             if (www.result != UnityWebRequest.Result.Success)
             {
+                Debug.Log(url);
+                Debug.Log(www.downloadHandler.text);
                 Debug.LogErrorFormat(www.error);
             }
             else
