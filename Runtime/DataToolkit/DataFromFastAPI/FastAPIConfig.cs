@@ -115,7 +115,7 @@ namespace Cameo
         public static string BaseListUrl { get { return BaseAPIUrl + "/sheet/get_all_values"; } }
 
         //下載遊戲資料的Url(from google sheet)
-        public static string BaseDataUrl { get { return BaseAPIUrl + "/sheet/get_after_2_rows"; } }
+        public static string BaseDataUrl { get { return BaseAPIUrl + "/sheet/get_after_2_rows_v2"; } }
         public const string SpreadSheetKey = "str_spreadsheet";
         public const string WorkSheetKey = "str_worksheet";
 
