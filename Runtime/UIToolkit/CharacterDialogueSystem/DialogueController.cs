@@ -317,11 +317,18 @@ public class DialogueController : MonoBehaviour
         curBTN.interactable = true;
         curBTN.onClick.AddListener(delegate {
             curBTN.interactable = false;
-            action.Invoke();
+            //action.Invoke();
+            
+            StartCoroutine(DelayAction(0.1f, action));
 
-            StartCoroutine(EnableButtonAfterDelay(curBTN, 0.1f));
+            StartCoroutine(EnableButtonAfterDelay(curBTN, 0.2f));
         });
         AddBTNClickSound(curBTN);
+    }
+    IEmurator DelayAction(float seconds,Action action)
+    {
+        yield return new WaitForSeconds(seconds);
+        action.Invoke();
     }
 
     IEnumerator EnableButtonAfterDelay(Button button, float seconds)
