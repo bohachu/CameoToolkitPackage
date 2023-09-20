@@ -325,7 +325,7 @@ public class DialogueController : MonoBehaviour
         });
         AddBTNClickSound(curBTN);
     }
-    IEmurator DelayAction(float seconds,Action action)
+    IEnumerator DelayAction(float seconds,Action action)
     {
         yield return new WaitForSeconds(seconds);
         action.Invoke();
