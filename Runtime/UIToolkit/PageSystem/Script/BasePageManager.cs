@@ -26,7 +26,13 @@ namespace Cameo.UI
         }
         #endif
         public string ID;
-
+        public string CurrentPageID
+        {
+            get
+            {
+                return currentPageID;
+            }
+        }
         public UnityEvent OnSwitchStart;
 
         public UnityEvent OnSwitchEnd;
