@@ -319,9 +319,9 @@ public class DialogueController : MonoBehaviour
             curBTN.interactable = false;
             //action.Invoke();
             
-            StartCoroutine(DelayAction(0.1f, action));
+            StartCoroutine(DelayAction(0.03f, action));
 
-            StartCoroutine(EnableButtonAfterDelay(curBTN, 0.2f));
+           // StartCoroutine(EnableButtonAfterDelay(curBTN, 0.2f));
         });
         AddBTNClickSound(curBTN);
     }

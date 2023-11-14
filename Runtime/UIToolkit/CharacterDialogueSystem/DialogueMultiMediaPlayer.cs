@@ -10,6 +10,7 @@ namespace Cameo
         //讓其他延伸媒體播放器可以接收到
         public Action<string> MultiPlayerAddOnEvent;
         public Action CloseMediaEvent;
+        public Action CloseMediaEventWithoutFunc;
         string preUrl;
         public void PlayMedia(string url)
         {
@@ -36,8 +37,8 @@ namespace Cameo
                     PlayMedia(preUrl);
             }else
             {
-                if(CloseMediaEvent!=null)
-                    CloseMediaEvent();
+                if(CloseMediaEventWithoutFunc!=null)
+                    CloseMediaEventWithoutFunc();
             }
         }
         public void Reset()
