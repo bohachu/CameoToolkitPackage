@@ -162,6 +162,14 @@ public class DialogueController : MonoBehaviour
         }
     }
     public OnDialogueShowEvent _OnDialogueShowEvent;
+
+    public bool IsDialogueShow
+    {
+        get
+        {
+            return DialogRoot.activeSelf;
+        }
+    }
     public Text DialogueText;
     public Button dialogueBTN;
     public Image BGImage;
@@ -330,7 +338,17 @@ public class DialogueController : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         action.Invoke();
     }
-
+    public void SkipDialogue()
+    {
+        //todo : 要重新寫一下這個功能，因為目前的寫法會有問題
+        if (CurrentDialogue != null)
+        {
+            if (CurrentDialogue.IsActionEnable)
+            {
+                CurrentDialogue.Action.Invoke();
+            }
+        }
+    }
     IEnumerator EnableButtonAfterDelay(Button button, float seconds)
     {
         yield return new WaitForSeconds(seconds);
