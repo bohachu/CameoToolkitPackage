@@ -142,6 +142,7 @@ namespace Cameo.UI
                 isEnableSwitchPage = false;
                 Debug.Log("SwitchTo "+ nextPageID);
                 createNextPage(nextPageID, false, paramMapping);
+                Debug.Log("createNextPage "+ nextPageID);
 
                 this.isSkipAnimation = isSkipAnimation;
                 isToPrev = false;

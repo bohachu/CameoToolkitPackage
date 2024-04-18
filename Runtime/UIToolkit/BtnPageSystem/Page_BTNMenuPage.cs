@@ -168,6 +168,8 @@ namespace Cameo.UI
                     state = GetStateByID(btn.bntID);
                     
                 }
+                Debug.Log(btn.bntID);
+                Debug.Log(btn.button);
                 btn.button.enabled = !state.isLock;
 
                 if(btn.LockImgObj!=null)

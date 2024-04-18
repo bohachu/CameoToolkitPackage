@@ -7,7 +7,7 @@ using Cameo.UI;
 
 // 需要把BTNMenuPage的private List<BTNUISet> buttons 改成 public
 
-public class SublevelProgress : MonoBehaviour
+public class UI_BTNSublevelProgress : MonoBehaviour
 {
     public Image ActiveProgress; // 进度条的 Image 组件
 
