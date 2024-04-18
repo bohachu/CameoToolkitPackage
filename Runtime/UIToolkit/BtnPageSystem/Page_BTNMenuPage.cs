@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using UnityEngine.UI;
 using Cameo;
 using Cameo.UI;
+using Sirenix.Utilities;
 /// <summary>
 /// 可重用的按鈕選單
 /// 下載選單資料
@@ -32,6 +33,7 @@ namespace Cameo.UI
         public Sprite LockImg;
         public Sprite NormImg;
         public string PageID;
+        public bool IsSublevel;
         public string bntID
         {
             get
@@ -181,6 +183,40 @@ namespace Cameo.UI
                     if (btn.LockImg != null)
                         btn.image.sprite = btn.LockImg;
                 }
+                // 判斷有子關卡時的圖示鎖定與否
+                if (btn.IsSublevel){
+                    int progress = 0;
+                    float waitTime = 0f;
+                    float maxWaitTime = 1f; // 最大等待一秒
+                    string sublevelID = btn.bntData.NextPageIndexID;
+
+                    if (!string.IsNullOrEmpty(sublevelID)){
+                        Debug.Log("SetBtnLockByState[sublevel]: NextPageIndexID: " + sublevelID);
+                        List<BTNData> sublevelData = UI_BTNDataManager.Instance.GetBTNData(sublevelID);
+                        for (int j = 0; j< sublevelData.Count; j++)
+                        {
+                            var sublevelProcess = UI_BTNDataManager.Instance.GetMissionData(sublevelID, sublevelData[j].BTNID);
+                            if (sublevelProcess == null || !sublevelProcess.isDone)
+                            {
+                                break;
+                            }
+                            progress += 1;
+                        }
+                        if (progress != 3){
+                            if (btn.LockImg != null)
+                                btn.image.sprite = btn.LockImg;
+                        }
+                        else{
+                            if(btn.NormImg!=null)
+                                btn.image.sprite = btn.NormImg;
+                        }
+
+                        
+                    }
+                    else{
+                        Debug.Log("SetBtnLockByState[sublevel]: 讀不到BTNData");
+                    }
+                }
             }
         }
         public void SetupState(List<MissionBTNState> states)
@@ -205,14 +241,14 @@ public class Page_BTNMenuPage : BasePage
 {
     [Tooltip("用於存取專屬此頁面的Menu與state data，必須與FileIndex中的資料相同")]
     [SerializeField]
-    protected string BTNMenuUniqueID = "StoryMode";
+    public string BTNMenuUniqueID = "StoryMode";
     [SerializeField]
     protected Button Button_Return;//just hide UI, not close
     [Tooltip("有指定UI物件的話，會依據上稿的按鈕name來定義下一頁面的title")]
     [SerializeField]
     protected Text TitleText;
     [SerializeField]
-    protected List<BTNUISet> buttons;
+    public List<BTNUISet> buttons;
     [SerializeField]
     protected UI_BTNLancherBase DefaultLancher;
     [SerializeField]
@@ -393,7 +429,7 @@ public class Page_BTNMenuPage : BasePage
         }
         
     }
- 
+
     void ActiveDisactiveAllBTNs(bool isActive)
     {
         Debug.Log("將所有按鈕都 開或關 ActiveDisactiveAllBTNs:" + isActive);
@@ -483,7 +519,6 @@ public class Page_BTNMenuPage : BasePage
         {
             if (i >= buttons.Count) break;
             
-            buttons[i].InitData(btnDatas[i]);
             if (!string.IsNullOrEmpty(btnDatas[i].ImageName))
             {
                 Sprite normimg = ResourceManager.Instance.LoadAsset<Sprite>(btnDatas[i].ImageName);
@@ -494,6 +529,9 @@ public class Page_BTNMenuPage : BasePage
                 Sprite lockimg = ResourceManager.Instance.LoadAsset<Sprite>(btnDatas[i].LockImageName);
                 buttons[i].LockImg = lockimg;
             }
+            
+            buttons[i].InitData(btnDatas[i]);
+
         }
     }
     protected List<MissionBTNState> SetupMissionData(List<MissionBTNState> missionData)
