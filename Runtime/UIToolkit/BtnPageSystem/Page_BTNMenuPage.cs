@@ -168,8 +168,7 @@ namespace Cameo.UI
                     state = GetStateByID(btn.bntID);
                     
                 }
-                Debug.Log(btn.bntID);
-                Debug.Log(btn.button);
+                //Debug.Log(btn.bntID);
                 btn.button.enabled = !state.isLock;
 
                 if(btn.LockImgObj!=null)
@@ -188,8 +187,6 @@ namespace Cameo.UI
                 // 判斷有子關卡時的圖示鎖定與否
                 if (btn.IsSublevel){
                     int progress = 0;
-                    float waitTime = 0f;
-                    float maxWaitTime = 1f; // 最大等待一秒
                     string sublevelID = btn.bntData.NextPageIndexID;
 
                     if (!string.IsNullOrEmpty(sublevelID)){
