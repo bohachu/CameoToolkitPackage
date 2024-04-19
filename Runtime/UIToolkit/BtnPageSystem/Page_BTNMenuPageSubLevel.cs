@@ -111,12 +111,16 @@ public class Page_BTNMenuPageSubLevel : BasePage
                 () => {
                     //遊戲取消後，顯示本次選單頁面
                     ActiveDisactiveAllBTNs(true);
+                    OnBackClicked();
                 }));
             ActiveDisactiveAllBTNs(false);
         }
         else if(!string.IsNullOrEmpty(obj.PageID))
         {//如果有填寫PageID, 則會啟動換頁
             pageManager.SwitchTo(obj.PageID,false,CreateParam(obj.bntData));
+        }
+        else{
+            Debug.Log("Launcher is null && obj.PageID is null");
         }
 
     }
