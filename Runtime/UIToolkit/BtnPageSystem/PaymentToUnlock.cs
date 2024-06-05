@@ -82,4 +82,12 @@ public class PaymentToUnlock : MonoBehaviour
        //  PlayerDataManager.Instance.AdaptiveLearningCoinCout-= SpendCoins;
        //  PlayerDataManager.Instance.PostPlayerPurchaseTask("解鎖高中英文關卡", SpendCoins);
     }
+    public void LogPayment(string levelName)
+    {
+        AddPaymentLog(levelName, UnLockFee);
+    }
+    protected virtual void AddPaymentLog(string levelName, int spendCoins)
+    {
+        // LogManager.Instance.AppendLog(LogTableDefine.table_player.ToString(), LogDefine.game_coin.ToString(), new string[] { "目的:解鎖關卡" + levelName, "花費金幣:" + spendCoins.ToString() });
+    }
 }

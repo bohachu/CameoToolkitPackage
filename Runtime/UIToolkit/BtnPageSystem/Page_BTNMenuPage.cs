@@ -361,6 +361,7 @@ public class Page_BTNMenuPage : BasePage
                         paymentBox.ShowPaymentBox(() =>
                         {
                         UnlockBTN(obj.bntID);
+                        paymentBox.LogPayment(obj.bntID);
                         Debug.Log("付費解鎖成功:"+obj.bntID+","+obj.bntData.Name);
                         });
                     }
