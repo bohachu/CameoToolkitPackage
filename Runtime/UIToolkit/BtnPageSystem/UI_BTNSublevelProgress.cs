@@ -9,7 +9,9 @@ using Cameo.UI;
 
 public class UI_BTNSublevelProgress : MonoBehaviour
 {
-    public Image ActiveProgress; // 进度条的 Image 组件
+    //001 public Image ActiveProgress; // 进度条的 Image 组件 
+    [SerializeField]
+    private Image ActiveProgress; // 进度条的 Image 组件
 
     void Start()
     {
@@ -49,8 +51,8 @@ public class UI_BTNSublevelProgress : MonoBehaviour
                 Debug.Log("ParentButton is null");
         }
     }
-
-    public IEnumerator UpdateProgress(BTNUISet button)
+    //002 public IEnumerator UpdateProgress(BTNUISet button)
+    public virtual IEnumerator UpdateProgress(BTNUISet button)
     {
         int progress = 0;
         float waitTime = 0f;
@@ -79,6 +81,11 @@ public class UI_BTNSublevelProgress : MonoBehaviour
         //Debug.Log(button.bntData.NextPageIndexID + " level progress: "+ progress);
 
         // 根据进度数据更新进度条
+        ActivateProgress(progress);
+    }
+    //003 extract as method
+    protected virtual void ActivateProgress(int progress)
+    {
         switch (progress)
         {
             case 1:
