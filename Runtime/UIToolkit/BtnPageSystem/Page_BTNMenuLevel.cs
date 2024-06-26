@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Cameo;
 using Cameo.UI;
 using Newtonsoft.Json;
+using System.Dynamic;
 /// <summary>
 /// 這個是高中英文的上稿內容，增加了，地圖圖片，以及書籍連結。
 /// </summary>
@@ -17,7 +18,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
         public UI_BTNLancherBase Lancher;
     }
     public List<LancherSelector> LancherSelectors;
-    UI_BTNLancherBase GetLancher(string LancherName)
+    protected UI_BTNLancherBase GetLancher(string LancherName)
     {
         //Debug.Log("判斷 GetLancher:"+LancherName);
         foreach (var item in LancherSelectors)
@@ -27,7 +28,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
                 return item.Lancher;
             }
         }
-//        Debug.LogError("找不到LancherName:"+LancherName);
+        Debug.LogError("找不到LancherName:"+LancherName);
         return null;
     }
 
@@ -95,7 +96,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
         public string GameLauncher;
     }
 
-    void SetupLancher()
+    protected void SetupLancher()
     {
         var BTNData = UI_BTNDataManager.Instance.GetBTNData(BTNMenuUniqueID);
          for(int i=0;i< BTNData.Count; i++)
@@ -109,11 +110,76 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             }
         }
     }
-
+    [SerializeField]
+    UI_BTNLancherBase _subLevelLauncher;
+    public override void OnOpen()
+    {
+        base.OnOpen();
+        for (int i = 0; i < buttons.Count; i++)
+        {
+            if (UI_BTNDataManager.Instance.GetPreloader("Sublevel_" + buttons[i].bntData.BTNID) == null)
+            {
+                buttons[i].IsSublevel = false;
+                buttons[i].button.gameObject.GetComponentInChildren<UI_BTNSublevelProgress>().gameObject.SetActive(false);
+            }
+            else
+                buttons[i].btnLuncher = _subLevelLauncher;
+        }
+    }
     public override void SetupBTNUI()
     {
-        Debug.Log("level SetupBTNUI");
-        base.SetupBTNUI();
+        foreach (var obj in buttons)
+        {
+            if (obj.UnLockBtn != null)
+            {
+                obj.UnLockBtn.onClick.RemoveAllListeners();
+                obj.UnLockBtn.onClick.AddListener(() =>
+                {
+                    if (paymentBox == null)
+                    {
+                        Debug.LogError("找不到payment box");
+                    }
+                    else
+                    {
+                        paymentBox.ShowPaymentBox(() =>
+                        {
+                            UnlockBTN(obj.bntID);
+                            paymentBox.LogPayment(obj.bntID);
+                            Debug.Log("付費解鎖成功:" + obj.bntID + "," + obj.bntData.Name);
+                        });
+                    }
+                });
+            }
+
+            if (obj.btnLuncher == null) obj.btnLuncher = DefaultLancher;
+            obj.button.onClick.RemoveAllListeners();
+            obj.button.onClick.AddListener(() =>
+            {
+                try
+                {
+                    curScelectedBTN = obj; 
+                    OnLancherClick();
+            }
+                catch (System.Exception ex)
+            {
+                Debug.LogError("遊戲過程有問題：" + ex.Message + "\n" + ex.StackTrace);
+                Debug.Log("應變措施，關閉所有messagebox");
+                MessageBoxManager.Instance.CloseAllOpenedBoxWithoutInvokeClosedFunc();
+            }
+
+        });
+        }
+        if (Button_Return != null)
+        {
+            //            Debug.Log("Button_Return 設定回上一頁");
+            Button_Return.onClick.RemoveAllListeners();
+            Button_Return.onClick.AddListener(() =>
+            {
+                //回到上一頁
+                pageManager.ToPrev();
+            });
+            Button_Return.enabled = true;
+        }
 
         SetupBTNImageWithScore();
 
@@ -162,7 +228,6 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
     {
         base.SetupWithParam();
 
-
         var BTNData = UI_BTNDataManager.Instance.GetBTNData(BTNMenuUniqueID);
         ExtraParamStruct test = new ExtraParamStruct();
        
@@ -188,4 +253,5 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
         }));
        
     }
+
 }

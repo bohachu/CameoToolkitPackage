@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using Cameo;
 using Cameo.UI;
 using Sirenix.Utilities;
+using System;
+using UnityEngine.Events;
 /// <summary>
 /// 可重用的按鈕選單
 /// 下載選單資料
@@ -251,7 +253,7 @@ public class Page_BTNMenuPage : BasePage
     [SerializeField]
     protected UI_BTNLancherBase DefaultLancher;
     [SerializeField]
-    PaymentToUnlock paymentBox;
+    protected PaymentToUnlock paymentBox;
     public const string Param_PageID = "Param_PageID";
     public const string Param_Title = "Param_Title";
     private void onSwitch(string pageID)
@@ -264,7 +266,7 @@ public class Page_BTNMenuPage : BasePage
     }
 
     protected PlayerMissionState playerMissionState;
-    UI_BTNLancherBase gameLancher = null;//目前開啟的遊戲啟動器，需要關卡按鈕被點選的時候實體化，遊戲結束時刪除
+    protected UI_BTNLancherBase gameLancher = null;//目前開啟的遊戲啟動器，需要關卡按鈕被點選的時候實體化，遊戲結束時刪除
     void ClearLancher()
     {
         if (gameLancher != null)
@@ -274,71 +276,81 @@ public class Page_BTNMenuPage : BasePage
             gameLancher = null;
         }
     }
-    BTNUISet curScelectedBTN = null;
-    void OnLancherClick()
+    protected BTNUISet curScelectedBTN = null;
+    protected UnityAction<ScoreResult> onMissionDone = null;
+    protected UnityAction onMissionCancel = null;
+    protected virtual void GameLauncherMissionSetup(BTNUISet obj)
     {
-        if(curScelectedBTN==null)
+        onMissionDone = (ScoreResult value) =>
+        {
+            Debug.Log("遊戲結束，執行OnMissionDone：");
+            //如果有填寫PageID, 則會啟動換頁，不會進入遊戲，沒有則是完成體驗，解鎖下一個按鈕
+            if (!string.IsNullOrEmpty(obj.PageID))
+            {
+                Debug.Log("啟動換頁：" + obj.PageID);
+                //如果有填寫PageID, 則會啟動換頁，不會進入遊戲
+                pageManager.SwitchTo(obj.PageID, false, CreateParam(obj.bntData));
+            }
+            else
+            {
+                //沒有pageID 所以是啟動遊戲模組已經成功完成體驗了
+                //遊戲成功後，顯示本次選單頁面，並解鎖下一個按鈕
+                Debug.Log("完成遊戲，將所有按鈕開啟");
+                ActiveDisactiveAllBTNs(true);
+                MissionDoneUnlockNextBTN(value);
+            }
+
+
+            Invoke("ClearLancher", 0.2f);
+        };
+
+        onMissionCancel = () =>
+        {
+            //遊戲取消後，顯示本次選單頁面
+            ActiveDisactiveAllBTNs(true);
+            Debug.Log("idle");
+        };
+    }
+    protected void OnLancherClick()
+    {
+        if (curScelectedBTN == null)
         {
             Debug.LogError("沒有選擇任何按鈕，無法啟動遊戲");
             return;
         }
-        var obj=curScelectedBTN;
+        var obj = curScelectedBTN;
         bool isFirstPlay = false;
-                var missionData = UI_BTNDataManager.Instance.GetMissionData(BTNMenuUniqueID, obj.bntID);
-                if(missionData==null)
-                {
-                    Debug.LogError("找不到mission data, 預設為非第一次遊玩");
-                }
-                else
-                    isFirstPlay = !missionData.isDone;
-                
-                if (obj.btnLuncher != null)
-                {
-                    Debug.Log("啟動："+ obj.bntID+","+obj.PageID);
-                    //如果有LancherProcess, 則會執行，沒有則略過
-                    if(gameLancher!=null)
-                    {
-                        Destroy(gameLancher.gameObject);
-                        gameLancher = null;
-                    }
-                    gameLancher = Instantiate<UI_BTNLancherBase>(obj.btnLuncher);
-                    gameLancher.GetComponent<RectTransform>().SetParent(transform, false);
-              
-                    StartCoroutine(gameLancher.LanchProcess(obj.bntData,(ScoreResult value)=> {
-                        Debug.Log("遊戲結束，執行OnMissionDone：");
-                        //如果有填寫PageID, 則會啟動換頁，不會進入遊戲，沒有則是完成體驗，解鎖下一個按鈕
-                        if (!string.IsNullOrEmpty(obj.PageID))
-                        {
-                             Debug.Log("啟動換頁："+ obj.PageID);
-                            //如果有填寫PageID, 則會啟動換頁，不會進入遊戲
-                            pageManager.SwitchTo(obj.PageID, false, CreateParam(obj.bntData));
-                        }
-                        else
-                        {
-                            //沒有pageID 所以是啟動遊戲模組已經成功完成體驗了
-                            //遊戲成功後，顯示本次選單頁面，並解鎖下一個按鈕
-                              Debug.Log("完成遊戲，將所有按鈕開啟");
-                                ActiveDisactiveAllBTNs(true);
-                                MissionDoneUnlockNextBTN(value);
-                        }
-                     
-                           
-                        Invoke("ClearLancher", 0.2f);
-                    } ,
-                        UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
-                        () => {
-                            //遊戲取消後，顯示本次選單頁面
-                            ActiveDisactiveAllBTNs(true);
-                        }));
-                    ActiveDisactiveAllBTNs(false);
-                }
-                else if(!string.IsNullOrEmpty(obj.PageID))
-                {//如果有填寫PageID, 則會啟動換頁
-                    pageManager.SwitchTo(obj.PageID,false,CreateParam(obj.bntData));
-                }
-                
-                SystemAudioCenter.Instance.PlayOneShot(AudioClipType.CommonUIButton);
-                   
+        var missionData = UI_BTNDataManager.Instance.GetMissionData(BTNMenuUniqueID, obj.bntID);
+        if (missionData == null)
+        {
+            Debug.LogError("找不到mission data, 預設為非第一次遊玩");
+        }
+        else
+            isFirstPlay = !missionData.isDone;
+
+        if (obj.btnLuncher != null)
+        {
+            Debug.Log("啟動：" + obj.bntID + "," + obj.PageID);
+            //如果有LancherProcess, 則會執行，沒有則略過
+            if (gameLancher != null)
+            {
+                Destroy(gameLancher.gameObject);
+                gameLancher = null;
+            }
+            gameLancher = Instantiate<UI_BTNLancherBase>(obj.btnLuncher);
+            gameLancher.GetComponent<RectTransform>().SetParent(transform, false);
+            GameLauncherMissionSetup(obj);
+            StartCoroutine(gameLancher.LanchProcess(obj.bntData, onMissionDone,
+                UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
+                onMissionCancel));
+            ActiveDisactiveAllBTNs(false);
+        }
+        else if (!string.IsNullOrEmpty(obj.PageID))
+        {//如果有填寫PageID, 則會啟動換頁
+            pageManager.SwitchTo(obj.PageID, false, CreateParam(obj.bntData));
+        }
+
+        SystemAudioCenter.Instance.PlayOneShot(AudioClipType.CommonUIButton);
     }
     
     public virtual void SetupBTNUI()
@@ -383,7 +395,6 @@ public class Page_BTNMenuPage : BasePage
                     Debug.Log("應變措施，關閉所有messagebox");
                     MessageBoxManager.Instance.CloseAllOpenedBoxWithoutInvokeClosedFunc();
                 }
-                   
             });
         }
         if (Button_Return != null)
@@ -398,7 +409,7 @@ public class Page_BTNMenuPage : BasePage
             Button_Return.enabled = true;
         }
     }
-    Dictionary<string,object> CreateParam(BTNData curBTNData)
+    protected Dictionary<string,object> CreateParam(BTNData curBTNData)
     {
         ///為下一個page建立輸入資料
         Dictionary<string, object> parm = new Dictionary<string, object>();
@@ -430,7 +441,7 @@ public class Page_BTNMenuPage : BasePage
         
     }
 
-    void ActiveDisactiveAllBTNs(bool isActive)
+    protected void ActiveDisactiveAllBTNs(bool isActive)
     {
         Debug.Log("將所有按鈕都 開或關 ActiveDisactiveAllBTNs:" + isActive);
         if(isActive)
@@ -471,9 +482,10 @@ public class Page_BTNMenuPage : BasePage
         SetupBTNUI();
     }
 
-    public void MissionDoneUnlockNextBTN(ScoreResult result)
+    public virtual void MissionDoneUnlockNextBTN(ScoreResult result)
     {
-        //依據任務分數，判斷是否要解鎖下一個按鈕
+        Debug.Log("Mission Done");
+
         string NextBTNID = playerMissionState.getNextBTNID(result.ID, buttons);
         if (string.IsNullOrEmpty(NextBTNID))
         {
@@ -510,7 +522,6 @@ public class Page_BTNMenuPage : BasePage
         SetupBTNUI();
         Debug.Log("關卡解鎖完成");
     }
-
     //資料設定
     protected virtual void SetupBTNs(List<BTNData> btnDatas)
     {
@@ -549,8 +560,6 @@ public class Page_BTNMenuPage : BasePage
         return playerMissionState.missionBTNStates;
     }
     #region 資料下載上傳
-   
-   
     public void UploadMissionState()
     {
         UI_BTNDataManager.Instance.SetMissionData(BTNMenuUniqueID, playerMissionState.missionBTNStates);
