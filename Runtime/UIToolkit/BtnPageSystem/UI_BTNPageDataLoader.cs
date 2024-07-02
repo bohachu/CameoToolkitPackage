@@ -105,7 +105,7 @@ public class UI_BTNPageDataLoader : MonoBehaviour
         yield return LoadPlayerMissionState(StateFileName).AsIEnumerator();
 
         isLoad = true;
-//        Debug.Log(name + " Loadding End");
+        //Debug.Log(name + " Loadding End");
         yield return null;
     }
     List<string> GetImagesAddress(List<BTNData> data)
@@ -135,25 +135,24 @@ public class UI_BTNPageDataLoader : MonoBehaviour
 
         try
         {
-        var downloadIndex = DownloadInfoManager.Instance.DownloadInfo(BTNDtataSheetID);
-        if (downloadIndex == null)
-        {
-            Debug.Log("找不到sheet index:" + BTNDtataSheetID);
-        }
+            var downloadIndex = DownloadInfoManager.Instance.DownloadInfo(BTNDtataSheetID);
+            if (downloadIndex == null){
+                Debug.Log("找不到sheet index:" + BTNDtataSheetID);
+            }else{
+                var SpreadSheet = downloadIndex.SpreadSheet;
+                var WorkSheet = downloadIndex.WorkSheet;
+                string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseDataUrl,
+                    FastAPISettings.AccountKey,  GlobalDataMediator.PlayerAccount, 
+                    FastAPISettings.TokenKey, GlobalDataMediator.PlayerToken,
+                    FastAPISettings.SpreadSheetKey, SpreadSheet,
+                    FastAPISettings.WorkSheetKey, WorkSheet);
 
-        var SpreadSheet = downloadIndex.SpreadSheet;
-        var WorkSheet = downloadIndex.WorkSheet;
-        string url = string.Format("{0}/?{1}={2}&{3}={4}&{5}={6}.sheet&{7}={8}", FastAPISettings.BaseDataUrl,
-                FastAPISettings.AccountKey,  GlobalDataMediator.PlayerAccount, 
-                FastAPISettings.TokenKey, GlobalDataMediator.PlayerToken,
-                FastAPISettings.SpreadSheetKey, SpreadSheet,
-                FastAPISettings.WorkSheetKey, WorkSheet);
-
-            string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
-//            Debug.Log(jsonStr);
-            btnDatas = JsonConvert.DeserializeObject<List<BTNData>>(jsonStr);
-            //Debug.Log(menuList[0].ToString());
-            //return menuList;
+                string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
+                //Debug.Log(jsonStr);
+                btnDatas = JsonConvert.DeserializeObject<List<BTNData>>(jsonStr);
+                //Debug.Log(menuList[0].ToString());
+                //return menuList;
+            }
         }
         catch (System.Exception e)
         {
@@ -171,17 +170,17 @@ public class UI_BTNPageDataLoader : MonoBehaviour
                 FastAPISettings.TokenKey, GlobalDataMediator.PlayerToken,
                 FastAPISettings.FileKey, StateFileName);
 
-//        Debug.Log("Stste file : "+url);
+        //Debug.Log("Stste file : "+url);
         string jsonStr = await FileRequestHelper.Instance.LoadJsonString(url);
         if (jsonStr.Contains("No such file"))
         {
-//            Debug.Log("找不到檔案，有可能是第一次使用者，進行建立檔案");
+            //Debug.Log("找不到檔案，有可能是第一次使用者，進行建立檔案");
             missionData = new List<MissionBTNState>();
            // return missionState;
         }
         else
         {
-//            Debug.Log(jsonStr);
+            //Debug.Log(jsonStr);
             missionData = JsonConvert.DeserializeObject<List<MissionBTNState>>(jsonStr);
             //JsonTool.ListJsonConverter<MissionBTNState>(jsonStr);
            // return missionState;
