@@ -299,7 +299,15 @@ public class Page_BTNMenuPageSubLevel : BasePage
                 //沒有下一個按鈕ＩＤ了，全部任務完成，要解鎖上一層menu的BTNID，顯示成功提示並且關閉本頁，回到上一頁
                 var State = playerMissionState.GetStateByID(result.ID);
                 State.isDone = true;
-              
+                // 把所有button的isLock設為false, 第一個button為true
+                for (int i = 0; i < buttons.Count; i++)
+                {
+                    string buttonID = buttons[i].bntID;
+                    var buttonState = playerMissionState.GetStateByID(buttonID);
+                    Debug.Log("已鎖定"+buttonID+":"+(i!=0?"True":"False"));
+                    buttonState.isLock = !(i == 0); // 第一個button設為true，其它設為false
+                }
+
                 Debug.Log("All mission done，完全過關");
             }
             else
