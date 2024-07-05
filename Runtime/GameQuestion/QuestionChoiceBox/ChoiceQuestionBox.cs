@@ -159,7 +159,7 @@ namespace Cameo.QuestionGame
         [SerializeField]
         protected bool isAutoCloseBox = true; //是否在答題完成兩秒後自動關閉視窗
         float startTime;
-        bool isAnserCorrect = false;
+        public bool isAnserCorrect = false;
         bool isAnsered=false;
 
         public int workingTime
@@ -171,6 +171,7 @@ namespace Cameo.QuestionGame
         public UnityEvent OnClosed;
         public UnityEvent OnAnswered;
         public UnityEvent OnStartSetting;
+        public int ClickNum;
     
         protected virtual void onStartSetting() { }
 
@@ -200,6 +201,14 @@ namespace Cameo.QuestionGame
             OnStartSetting.Invoke();
             isAnsered=false;
             startTime = Time.time;
+            ClickNum = 0;
+        }
+        void Update()
+        {
+            if(Input.GetMouseButtonDown(0)|| (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
+            {
+                ClickNum++;
+            }
         }
 
         protected virtual void setQuestion()
