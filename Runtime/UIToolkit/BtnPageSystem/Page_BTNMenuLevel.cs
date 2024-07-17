@@ -117,13 +117,13 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
         base.OnOpen();
         for (int i = 0; i < buttons.Count; i++)
         {
-            if (UI_BTNDataManager.Instance.GetPreloader("Sublevel_" + buttons[i].bntData.BTNID) == null)
+            if (UI_BTNDataManager.Instance.GetPreloader("Sublevel_" + buttons[i].bntData.BTNID) != null)
             {
-                buttons[i].IsSublevel = false;
-                buttons[i].button.gameObject.GetComponentInChildren<UI_BTNSublevelProgress>().gameObject.SetActive(false);
-            }
-            else
+                buttons[i].IsSublevel = true;
+                buttons[i].PageID = "SublevelPage";
+                buttons[i].button.gameObject.GetComponentInChildren<UI_BTNSublevelProgress>().gameObject.SetActive(true);
                 buttons[i].btnLuncher = _subLevelLauncher;
+            }
         }
     }
     public override void SetupBTNUI()
