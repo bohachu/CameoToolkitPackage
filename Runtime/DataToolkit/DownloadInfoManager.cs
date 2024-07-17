@@ -33,9 +33,13 @@ namespace Cameo
                 FastAPISettings.DataIndexStartRow, parser, userAccount, token);
 
             indexMap = new Dictionary<string, DownloadInfo>();
-
             foreach (DownloadInfo dataIndex in dataIndices)
             {
+                if (dataIndex == null)
+                {
+                    Debug.LogWarning("FileIndex sheet might has blank cells or wrong format");
+                    continue;
+                }
                 indexMap[dataIndex.ID] = dataIndex;
             }
             isLoaded = true;
