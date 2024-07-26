@@ -121,7 +121,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             {
                 buttons[i].IsSublevel = true;
                 buttons[i].PageID = "SublevelPage";
-                buttons[i].button.gameObject.GetComponentInChildren<UI_BTNSublevelProgress>().gameObject.SetActive(true);
+                buttons[i].button.gameObject.GetComponentInChildren<UI_BTNSublevelProgress>(true).gameObject.SetActive(true);
                 buttons[i].btnLuncher = _subLevelLauncher;
             }
         }
