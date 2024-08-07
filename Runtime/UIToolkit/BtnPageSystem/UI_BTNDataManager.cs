@@ -83,7 +83,9 @@ public class UI_BTNDataManager : Singleton<UI_BTNDataManager>
                 return obj;
             
         }
+#if UNITY_EDITOR
         Debug.LogError("找不到對應的 BTN Menu Preloader, 請設定場景中"+name+",對應ID:"+BTNMenuUniqueID);
+#endif
         return null;
     }
     public IEnumerator LoadAll()

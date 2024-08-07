@@ -28,7 +28,9 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
                 return item.Lancher;
             }
         }
+#if UNITY_EDITOR
         Debug.LogError("找不到LancherName:"+LancherName);
+#endif
         return null;
     }
 
