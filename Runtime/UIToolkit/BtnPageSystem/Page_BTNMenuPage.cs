@@ -103,6 +103,7 @@ namespace Cameo.UI
         public bool isDone = false; //任務是否完成
         public bool isLock = true;  //任務是否鎖定中
         public int Score=0; //任務的分數
+        public int PlayNum = 0;
         public MissionBTNState()
         {
             BTNID = "";
@@ -299,8 +300,6 @@ public class Page_BTNMenuPage : BasePage
                 ActiveDisactiveAllBTNs(true);
                 MissionDoneUnlockNextBTN(value);
             }
-
-
             Invoke("ClearLancher", 0.2f);
         };
 
@@ -326,7 +325,7 @@ public class Page_BTNMenuPage : BasePage
             Debug.LogError("找不到mission data, 預設為非第一次遊玩");
         }
         else
-            isFirstPlay = !missionData.isDone;
+            isFirstPlay = (!missionData.isDone) && (missionData.PlayNum == 0);
 
         if (obj.btnLuncher != null)
         {
@@ -341,7 +340,7 @@ public class Page_BTNMenuPage : BasePage
             gameLancher.GetComponent<RectTransform>().SetParent(transform, false);
             GameLauncherMissionSetup(obj);
             StartCoroutine(gameLancher.LanchProcess(obj.bntData, onMissionDone,
-                UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
+                UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay, 
                 onMissionCancel));
             ActiveDisactiveAllBTNs(false);
         }
@@ -484,8 +483,6 @@ public class Page_BTNMenuPage : BasePage
 
     public virtual void MissionDoneUnlockNextBTN(ScoreResult result)
     {
-        Debug.Log("Mission Done");
-
         string NextBTNID = playerMissionState.getNextBTNID(result.ID, buttons);
         if (string.IsNullOrEmpty(NextBTNID))
         {
@@ -493,9 +490,10 @@ public class Page_BTNMenuPage : BasePage
             return;
         }
         var curState = playerMissionState.GetStateByID(result.ID);
-        curState.Score = Mathf.CeilToInt(result.Score);
-        
-        if(result.IsPass)
+        if (curState.Score < Mathf.CeilToInt(result.Score))
+            curState.Score = Mathf.CeilToInt(result.Score);
+        curState.PlayNum = curState.PlayNum + 1;
+        if (result.IsPass)
         {
             //通過，解鎖
             Debug.Log("通過，解鎖" + NextBTNID);

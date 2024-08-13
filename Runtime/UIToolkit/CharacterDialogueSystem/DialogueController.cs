@@ -552,10 +552,12 @@ public class DialogueController : MonoBehaviour
                 CenterImage.gameObject.SetActive(false);
             }
             //如果是影片或是iframe則播放
-//            Debug.Log("CenterImgChange 播放影片或是iframe:" + dialogueActionUnit.originData.CenterImage);
-            if(CenterMediaPlayer!=null)
+            //            Debug.Log("CenterImgChange 播放影片或是iframe:" + dialogueActionUnit.originData.CenterImage);
+            if (CenterMediaPlayer != null)
+            {
+                Debug.Log(dialogueActionUnit.originData.CenterImage);
                 CenterMediaPlayer.PlayMedia(dialogueActionUnit.originData.CenterImage);
-            
+            }
         }
         if (dialogueActionUnit.IsAudioEnable)
         {

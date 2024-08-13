@@ -96,6 +96,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
         public string BookUrl;
         public string MapImageID;
         public string GameLauncher;
+        public string VideoUrl;
     }
 
     protected void SetupLancher()

@@ -286,9 +286,10 @@ public class Page_BTNMenuPageSubLevel : BasePage
             return;
         }
         var curState = playerMissionState.GetStateByID(result.ID);
-        curState.Score = Mathf.CeilToInt(result.Score);
-
-        if(result.IsPass)
+        if (curState.Score < Mathf.CeilToInt(result.Score))
+            curState.Score = Mathf.CeilToInt(result.Score);
+        curState.PlayNum = curState.PlayNum + 1;
+        if (result.IsPass)
         {
             //通過，解鎖
             Debug.Log("通過，解鎖" + NextBTNID);
