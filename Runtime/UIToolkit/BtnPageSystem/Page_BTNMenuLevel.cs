@@ -29,7 +29,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             }
         }
 #if UNITY_EDITOR
-        Debug.LogError("找不到LancherName:"+LancherName);
+        Debug.LogWarning("找不到LancherName:"+LancherName);
 #endif
         return null;
     }
@@ -84,11 +84,11 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
             }
             else
             {
-                Debug.LogError("沒有設定分數圖案");
+#if UNITY_EDITOR
+                Debug.LogWarning("沒有設定分數圖案");
+#endif
             }
         }
-
-        
     }
     
     public class ExtraParamStruct
@@ -115,9 +115,27 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
     }
     [SerializeField]
     UI_BTNLancherBase _subLevelLauncher;
-    public override void OnOpen()
+    public IEnumerator OnOpenLoad()
     {
-        base.OnOpen();
+        // BasePageAnimation[] pas = GetComponents<BasePageAnimation>();
+        // if(pas != null)
+        // {
+        //     for(int i = 0;i<pas.Length;++i)
+        //     {
+        //         pas[i].SetFrom();
+        //         print("Set black canvas");
+        //     }
+        // }
+        
+        SetupWithParam();
+        SetupBTNs(UI_BTNDataManager.Instance.GetBTNData(BTNMenuUniqueID));
+        foreach(BTNUISet btn in buttons){
+            //yield return UI_BTNDataManager.Instance.Load(btn.bntData.BTNID);
+            if(btn.bntData.NextPageIndexID != null && btn.bntData.NextPageIndexID != "")
+                yield return UI_BTNDataManager.Instance.Load(btn.bntData.NextPageIndexID);
+        }
+        SetupMissionData(UI_BTNDataManager.Instance.GetMissionData(BTNMenuUniqueID));
+        SetupBTNUI();       
         for (int i = 0; i < buttons.Count; i++)
         {
             if (UI_BTNDataManager.Instance.GetPreloader("Sublevel_" + buttons[i].bntData.BTNID) != null)
@@ -128,6 +146,16 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
                 buttons[i].btnLuncher = _subLevelLauncher;
             }
         }
+        LoadingPage.gameObject.SetActive(false);
+        base.Open(0.2f);
+    }
+    public Image LoadingPage;
+    public override void OnOpen()
+    {
+        LoadingPage.gameObject.SetActive(true);
+        // Do animation or loading page
+        
+        StartCoroutine(OnOpenLoad());
     }
     public override void SetupBTNUI()
     {
@@ -227,7 +255,7 @@ public class Page_BTNMenuLevel : Page_BTNMenuPage
 
     }
     //專為高中英文設計的上稿內容，增加了，地圖圖片，以及書籍連結。
-    protected override void SetupWithParam()
+    protected void SetupWithParam()
     {
         base.SetupWithParam();
 

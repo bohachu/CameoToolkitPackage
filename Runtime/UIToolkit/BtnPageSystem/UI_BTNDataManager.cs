@@ -9,9 +9,24 @@ public class UI_BTNDataManager : Singleton<UI_BTNDataManager>
 {
     public List<string> preloaderIndexNames;
     public List<UI_BTNPageDataLoader> preloaders;
-
+    public List<UI_BTNPageDataLoader> DynamicLoaders;
+    private Dictionary<string, UI_BTNPageDataLoader> _loaderCheckers= new Dictionary<string, UI_BTNPageDataLoader>();
+    private Dictionary<string, bool> _hasLoaded = new Dictionary<string, bool>();
     public GameObject BTNPageDataLoaderPrefab;
 
+    private void Awake()
+    {
+        for (int i = 0; i < preloaders.Count; i++)
+        {
+            _loaderCheckers.Add(preloaders[i].BTNMenuUniqueID, preloaders[i]);
+            _hasLoaded.Add(preloaders[i].BTNMenuUniqueID, false);
+        }
+        for (int i = 0; i < DynamicLoaders.Count; i++)
+        {
+            _loaderCheckers.Add(DynamicLoaders[i].BTNMenuUniqueID, DynamicLoaders[i]);
+            _hasLoaded.Add(DynamicLoaders[i].BTNMenuUniqueID, false);
+        }
+    }
     [Button]
     public void CreatePreloaderByName()
     {
@@ -34,19 +49,19 @@ public class UI_BTNDataManager : Singleton<UI_BTNDataManager>
     }
     public string GetStateFileName(string BTNMenuUniqueID)
     {
-        return GetPreloader(BTNMenuUniqueID).StateFileName;
+        return GetPreloader(BTNMenuUniqueID)?.StateFileName;
     }
     public string GetSheetID(string BTNMenuUniqueID)
     {
-        return GetPreloader(BTNMenuUniqueID).BTNDtataSheetID;
+        return GetPreloader(BTNMenuUniqueID)?.BTNDtataSheetID;
     }
     public IEnumerator Preload(string BTNMenuUniqueID)
     {
-         yield return GetPreloader(BTNMenuUniqueID).InitializeCoroutine();
+         yield return GetPreloader(BTNMenuUniqueID)?.InitializeCoroutine();
     }
     public List<BTNData> GetBTNData(string BTNMenuUniqueID)
     {
-        return GetPreloader(BTNMenuUniqueID).BtnDatas;
+        return GetPreloader(BTNMenuUniqueID)?.BtnDatas;
     }
     public MissionBTNState GetMissionData(string BTNMenuUniqueID, string BTNID)
     {
@@ -66,32 +81,63 @@ public class UI_BTNDataManager : Singleton<UI_BTNDataManager>
     }
     public List<MissionBTNState> GetMissionData(string BTNMenuUniqueID)
     {
-        return GetPreloader(BTNMenuUniqueID).MissionData;
+        return GetPreloader(BTNMenuUniqueID)?.MissionData;
     }
     public List<MissionBTNState> SetMissionData(string BTNMenuUniqueID, List<MissionBTNState>  data)
     {
         return GetPreloader(BTNMenuUniqueID).MissionData= data;
     }
+    
     public UI_BTNPageDataLoader GetPreloader(string BTNMenuUniqueID)
     {
-       
-        foreach(var obj in preloaders)
+        if (!(_loaderCheckers.ContainsKey(BTNMenuUniqueID)))
         {
-           // Debug.Log(obj.BTNMenuUniqueID + " compare to "+ BTNMenuUniqueID);
-            
-            if (obj.BTNMenuUniqueID == BTNMenuUniqueID)
-                return obj;
-            
-        }
 #if UNITY_EDITOR
-        Debug.LogError("找不到對應的 BTN Menu Preloader, 請設定場景中"+name+",對應ID:"+BTNMenuUniqueID);
+                Debug.LogError($"找不到對應的 BTN Loader, 請設定場景中{gameObject.name}, 對應ID:{BTNMenuUniqueID}");
 #endif
-        return null;
+            return null;
+        }
+        if (!_hasLoaded[BTNMenuUniqueID])
+        {
+#if UNITY_EDITOR
+                Debug.LogError($"Get 前未先 Load, 對應ID:{BTNMenuUniqueID}");
+#endif
+            return null;
+        }
+        return _loaderCheckers[BTNMenuUniqueID];
     }
     public IEnumerator LoadAll()
     {
         foreach (var obj in preloaders)
+        {
             yield return StartCoroutine(obj.InitializeCoroutine());
+            _hasLoaded[obj.BTNMenuUniqueID] = true;
+        }
+        for (int i = 0; i < DynamicLoaders.Count; i++)
+        {
+            preloaders.Add(DynamicLoaders[i]);
+        }
     }
-   
+    public IEnumerator Load(string btnID)
+    {
+        if (!(_loaderCheckers.ContainsKey(btnID) && _hasLoaded.ContainsKey(btnID)))
+        {
+#if UNITY_EDITOR
+                Debug.LogError($"找不到對應的 BTN Dynamic Loader, 請設定場景中{gameObject.name}, 對應ID:{btnID}");
+#endif
+            yield break;
+        }
+        if (_hasLoaded[btnID])
+            yield return null;
+        else
+        {
+            yield return StartCoroutine(_loaderCheckers[btnID].InitializeCoroutine());
+            _hasLoaded[btnID] = true;
+        }
+    }
+    public IEnumerator Load(List<string> btnIDs)
+    {
+        foreach (string btnID in btnIDs)
+            yield return StartCoroutine(Load(btnID));
+    }
 }
