@@ -98,9 +98,10 @@ public class Page_BTNMenuPageSubLevel : BasePage
                 {
                     //沒有pageID 所以是啟動遊戲模組已經成功完成體驗了
                     //遊戲成功後，顯示本次選單頁面，並解鎖下一個按鈕
-                        Debug.Log("完成遊戲，將所有按鈕開啟");
                         ActiveDisactiveAllBTNs(true);
+                        Debug.Log("完成遊戲，解鎖下一關");
                         MissionDoneUnlockNextBTN(value);
+                        Debug.Log("遊戲結束，顯示上層選單頁面");
                         OnBackClicked();
                 }
                 
@@ -109,8 +110,8 @@ public class Page_BTNMenuPageSubLevel : BasePage
             } ,
                 UI_BTNDataManager.Instance.GetSheetID(BTNMenuUniqueID), isFirstPlay,
                 () => {
-                    //遊戲取消後，顯示本次選單頁面
                     ActiveDisactiveAllBTNs(true);
+                    Debug.Log("遊戲取消後，顯示上層選單頁面");
                     OnBackClicked();
                 }));
             ActiveDisactiveAllBTNs(false);
@@ -240,8 +241,10 @@ public class Page_BTNMenuPageSubLevel : BasePage
         SetupBTNs(UI_BTNDataManager.Instance.GetBTNData(BTNMenuUniqueID));
         SetupMissionData(UI_BTNDataManager.Instance.GetMissionData(BTNMenuUniqueID));
 
-        SetupBTNUI();
-
+        SetupBTNUI();       
+    }
+    public override void OnOpened()
+    {
         BTNUISet highestUnlockedBtn = null;
         foreach (var btn in buttons)
         {
@@ -251,7 +254,7 @@ public class Page_BTNMenuPageSubLevel : BasePage
                 highestUnlockedBtn = btn;
             }
         }
-        Debug.Log("Going OnLancherClick() "+ curScelectedBTN!=null);
+        Debug.Log("Going OnLancherClick() "+ (curScelectedBTN!=null).ToString());
         if (highestUnlockedBtn != null)
         {
             curScelectedBTN = highestUnlockedBtn;
@@ -263,6 +266,10 @@ public class Page_BTNMenuPageSubLevel : BasePage
             {
                 curScelectedBTN = buttons[0];
                 OnLancherClick();
+            }
+            else
+            {
+                Debug.LogError("沒有任何Launcher可以點擊");
             }
         }
     }

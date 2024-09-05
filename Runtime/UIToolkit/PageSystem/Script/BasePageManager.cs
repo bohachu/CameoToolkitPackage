@@ -253,9 +253,8 @@ namespace Cameo.UI
             currentPage.OnOpen();
             currentPage.Open((isSkipAnimation) ? 0 : animationWaitTime);
             yield return new WaitForSeconds(openTime);
-            currentPage.OnOpened();
-
             isEnableSwitchPage = true;
+            currentPage.OnOpened();
 
             OnSwitchEnd.Invoke();
         }
