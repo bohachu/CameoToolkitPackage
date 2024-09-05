@@ -325,7 +325,9 @@ public class Page_BTNMenuPage : BasePage
             Debug.LogError("找不到mission data, 預設為非第一次遊玩");
         }
         else
-            isFirstPlay = (!missionData.isDone) && (missionData.PlayNum == 0);
+            // playnum==0的判斷會導致第一次遊玩失敗後, 就拿不到AwardFirst的獎勵, 所以註解掉
+            // 但因為不確定之前為什麼這麼寫, 所以先不刪掉
+            isFirstPlay = (!missionData.isDone) //&& (missionData.PlayNum == 0); 
 
         if (obj.btnLuncher != null)
         {
