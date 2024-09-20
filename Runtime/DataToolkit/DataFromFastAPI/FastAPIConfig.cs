@@ -82,6 +82,7 @@ namespace Cameo
     public static class FastAPISettings
     {  //Api domain
         public static string BaseAPIUrl = "https://falra-band.bowenchiu.repl.co";
+        public static string LocalAPIUrl = "http://127.0.0.1:8000";
         //引導玩家登入的Url
         public static string LoginPageUrl = "https://adl.edu.tw/HomePage/login/?sys=planting";
         public static string GameDataUrl = "";

@@ -7,7 +7,9 @@ using System;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System.Net;
-
+#if UNITY_EDITOR
+using System.Net.Http;
+#endif
 namespace Cameo
 {
     public class FileRequestHelper : Singleton<FileRequestHelper>
@@ -84,9 +86,13 @@ www.certificateHandler = cert;
 
         public async Task<string> LoadJsonString(string url)
         {
-         //   Debug.Log("01 LoadJsonString create request");
+#if UNITY_EDITOR
+            if (url.Contains("127.0.0.1") || url.Contains("localhost"))
+                return await LoadJsonStringLocal(url);
+#endif
+            //   Debug.Log("01 LoadJsonString create request");
             UnityWebRequest www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
-       #if UNITY_EDITOR
+#if UNITY_EDITOR
 var cert = new ForceAcceptAll();
 www.certificateHandler = cert;
 #endif
@@ -114,6 +120,32 @@ www.certificateHandler = cert;
                 return data;
             }
         }
+        public async Task<string> LoadJsonStringLocal(string url)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(url);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseData = await response.Content.ReadAsStringAsync();
+                        Debug.Log("Response: " + responseData);
+                        return responseData;
+                    }
+                    else
+                    {
+                        Debug.Log($"Error: {response.StatusCode}");
+                    }
+                }
+                catch (HttpRequestException e)
+                {
+                    Debug.Log("Request error: " + e.Message);
+                }
+            }
+            return null;
+        }
 
         public static string param_to_url(string key, string value)
         {
@@ -138,7 +170,7 @@ www.certificateHandler = cert;
             //Debug.Log(url);
 
             UnityWebRequest www = new UnityWebRequest(url);
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
 var cert = new ForceAcceptAll();
 www.certificateHandler = cert;
 #endif
@@ -453,6 +485,72 @@ www.certificateHandler = cert;
                 }
             }
         }
+        public static async Task<string> UploadNewRankScore(string url, string token, string userName, int score)
+        {
+            //Debug.Log(userName + " " + score.ToString());
+#if UNITY_EDITOR
+            if (url.Contains("127.0.0.1") || url.Contains("localhost"))
+            {
+                Debug.Log($"{url}/?str_user={userName}&int_score={score}");
+                using (HttpClient client = new HttpClient())
+                {
+                    try
+                    {
+                        Dictionary<string, object> requestBody = new Dictionary<string, object>();
+                        //requestBody[FastAPISettings.TokenKey] = token;
+                        requestBody[FastAPISettings.AccountKey] = userName;
+                        requestBody["int_score"] = score;
+                        string jsonStr = JsonConvert.SerializeObject(requestBody);
+                        StringContent httpContent = new StringContent(jsonStr, System.Text.Encoding.UTF8, "application/json");
+                        HttpResponseMessage response = await client.PostAsync(url, httpContent);
+                        
+                        if (response.IsSuccessStatusCode)
+                        {
+                            Debug.Log("");
+                        }
+                        else
+                            Debug.Log($"Error: {response.StatusCode}");
+                        
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        Debug.Log("Request error: " + e.Message);
+                    }
+                }
+                return "";
+            }
+#endif
+            using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
+            {
+                Dictionary<string, object> requestBody = new Dictionary<string, object>();
+                //requestBody[FastAPISettings.TokenKey] = token;
+                requestBody[FastAPISettings.AccountKey] = userName;
+                requestBody["int_score"] = score;
+                string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
+#if UNITY_EDITOR
+var cert = new ForceAcceptAll();
+www.certificateHandler = cert;
+#endif
+                //byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
+                www.uploadHandler = (UploadHandler)new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonStr));
+                www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+                www.SetRequestHeader("Content-Type", "application/json");
+                www.disposeUploadHandlerOnDispose = true;
+                www.disposeDownloadHandlerOnDispose = true;
+                await www.SendWebRequest();
+                if (www.result == UnityWebRequest.Result.ConnectionError)
+                {
+                    Debug.Log("Error While Sending: " + www.error);
+                    var outData = www.error;
+                    www.Dispose();
+                    return outData;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
         public async Task<string> UploadLog(string logTable, string logs, string UserAccount, string Token)
         {
             using (UnityWebRequest www = new UnityWebRequest(FastAPISettings.LogUploadUrl, "POST"))
@@ -500,7 +598,7 @@ www.certificateHandler = cert;
             form.AddBinaryData(FastAPISettings.UploadFileKey, file, fileName, "image/jpeg");
 
             UnityWebRequest www = UnityWebRequest.Post(url, form);
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
 var cert = new ForceAcceptAll();
 www.certificateHandler = cert;
 #endif
