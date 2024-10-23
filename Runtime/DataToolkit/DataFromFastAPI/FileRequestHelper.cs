@@ -76,10 +76,13 @@ www.certificateHandler = cert;
             }
             else
             {
-                //ebug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
+                //Debug.Log("size: " + (www.downloadHandler.data.Length / 1000).ToString() + "kb");
                 //Debug.Log(www.downloadHandler.text);
                 var data = www.downloadHandler.text;
                 www.Dispose();
+                if data.Contains("No such"){
+                    return null;
+                }
                 return parser(JsonMapper.ToObject(data));
             }
         }
@@ -497,7 +500,7 @@ www.certificateHandler = cert;
                     try
                     {
                         Dictionary<string, object> requestBody = new Dictionary<string, object>();
-                        //requestBody[FastAPISettings.TokenKey] = token;
+                        requestBody[FastAPISettings.TokenKey] = token;
                         requestBody[FastAPISettings.AccountKey] = userName;
                         requestBody["int_score"] = score;
                         string jsonStr = JsonConvert.SerializeObject(requestBody);
@@ -523,7 +526,7 @@ www.certificateHandler = cert;
             using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
             {
                 Dictionary<string, object> requestBody = new Dictionary<string, object>();
-                //requestBody[FastAPISettings.TokenKey] = token;
+                requestBody[FastAPISettings.TokenKey] = token;
                 requestBody[FastAPISettings.AccountKey] = userName;
                 requestBody["int_score"] = score;
                 string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
