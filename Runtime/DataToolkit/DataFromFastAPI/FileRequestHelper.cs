@@ -488,21 +488,22 @@ www.certificateHandler = cert;
                 }
             }
         }
-        public static async Task<string> UploadNewRankScore(string url, string token, string userName, int score)
+        public static async Task<string> UploadNewRankScore(string url, string userAccount, string token, string userName, int score)
         {
             //Debug.Log(userName + " " + score.ToString());
 #if UNITY_EDITOR
             if (url.Contains("127.0.0.1") || url.Contains("localhost"))
             {
-                Debug.Log($"{url}/?str_user={userName}&int_score={score}");
+                Debug.Log($"{url}/?str_user={userAccount}&int_score={score}&str_name={userName}");
                 using (HttpClient client = new HttpClient())
                 {
                     try
                     {
                         Dictionary<string, object> requestBody = new Dictionary<string, object>();
                         requestBody[FastAPISettings.TokenKey] = token;
-                        requestBody[FastAPISettings.AccountKey] = userName;
+                        requestBody[FastAPISettings.AccountKey] = userAccount;
                         requestBody["int_score"] = score;
+                        requestBody["str_name"] = userName;
                         string jsonStr = JsonConvert.SerializeObject(requestBody);
                         StringContent httpContent = new StringContent(jsonStr, System.Text.Encoding.UTF8, "application/json");
                         HttpResponseMessage response = await client.PostAsync(url, httpContent);
@@ -529,6 +530,7 @@ www.certificateHandler = cert;
                 requestBody[FastAPISettings.TokenKey] = token;
                 requestBody[FastAPISettings.AccountKey] = userName;
                 requestBody["int_score"] = score;
+                requestBody["str_name"] = userName;
                 string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
 #if UNITY_EDITOR
 var cert = new ForceAcceptAll();
