@@ -80,7 +80,7 @@ www.certificateHandler = cert;
                 //Debug.Log(www.downloadHandler.text);
                 var data = www.downloadHandler.text;
                 www.Dispose();
-                if data.Contains("No such"){
+                if (data.Contains("No such")){
                     return null;
                 }
                 return parser(JsonMapper.ToObject(data));
