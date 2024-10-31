@@ -123,6 +123,7 @@ www.certificateHandler = cert;
                 return data;
             }
         }
+#if UNITY_EDITOR
         public async Task<string> LoadJsonStringLocal(string url)
         {
             using (HttpClient client = new HttpClient())
@@ -149,6 +150,7 @@ www.certificateHandler = cert;
             }
             return null;
         }
+#endif
 
         public static string param_to_url(string key, string value)
         {
