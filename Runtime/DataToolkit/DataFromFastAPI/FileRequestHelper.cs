@@ -508,7 +508,7 @@ www.certificateHandler = cert;
                         requestBody["str_name"] = userName;
                         string jsonStr = JsonConvert.SerializeObject(requestBody);
                         StringContent httpContent = new StringContent(jsonStr, System.Text.Encoding.UTF8, "application/json");
-                        HttpResponseMessage response = await client.PostAsync(url, httpContent);
+                        HttpResponseMessage response = await client.PutAsync(url, httpContent);
                         
                         if (response.IsSuccessStatusCode)
                         {
@@ -526,7 +526,7 @@ www.certificateHandler = cert;
                 return "";
             }
 #endif
-            using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
+            using (UnityWebRequest www = new UnityWebRequest(url, "PUT"))
             {
                 Dictionary<string, object> requestBody = new Dictionary<string, object>();
                 requestBody[FastAPISettings.TokenKey] = token;
