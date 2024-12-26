@@ -530,7 +530,7 @@ www.certificateHandler = cert;
             {
                 Dictionary<string, object> requestBody = new Dictionary<string, object>();
                 requestBody[FastAPISettings.TokenKey] = token;
-                requestBody[FastAPISettings.AccountKey] = userName;
+                requestBody[FastAPISettings.AccountKey] = userAccount;
                 requestBody["int_score"] = score;
                 requestBody["str_name"] = userName;
                 string jsonStr = JsonConvert.SerializeObject(requestBody);//JsonMapper.ToJson(requestBody);
