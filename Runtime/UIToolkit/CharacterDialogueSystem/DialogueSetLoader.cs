@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Threading.Tasks;
+using System.Linq;
+
 namespace Cameo
 {
     [System.Serializable]
@@ -45,80 +47,66 @@ namespace Cameo
         }
         public Dictionary<string, DialogueSet> GetDialogueSetByGroupID(Dictionary<string, Sprite> Images)
         {
-            Dictionary<string, DialogueSet> dialogueFilter = new Dictionary<string, DialogueSet>();
+            int uniqueGroupCount = dialogDatas.Select(x => x.GroupID).Distinct().Count();
+            Dictionary<string, DialogueSet> dialogueFilter = new Dictionary<string, DialogueSet>(uniqueGroupCount);
             DialogData preData = null;
-            foreach (var obj in dialogDatas)
+            foreach (DialogData obj in dialogDatas)
             {
-                var oneDialogue = new DialogueActionUnit(obj);
+                DialogueActionUnit oneDialogue = new DialogueActionUnit(obj);
                 oneDialogue.characterExpression = (DialogueController.CharacterExpression)DialogueController.Instance.GetExpressionIndexByName(obj.RoleName);
                 //遇到hide指令，就把圖片清空
                
-                if (obj.BGImage.EndsWith(PresetImageCommand.Hide.ToString()))
-                {
-                    oneDialogue.BGImage = null;
-                    oneDialogue.IsBGChange = true;
-                }
-                if (obj.CenterImage.EndsWith(PresetImageCommand.Hide.ToString()))
-                {
-                    oneDialogue.CenterImg = null;
-                    oneDialogue.IsCenterImgChange = true;
-                }
+                ProcessBackgroundImage(obj, preData, oneDialogue, Images);
+                ProcessCenterImage(obj, preData, oneDialogue, Images);
 
-                if (!string.IsNullOrWhiteSpace(obj.BGImage))
+                if (!dialogueFilter.TryGetValue(obj.GroupID, out var dialogueSet))
                 {
-                    if(preData==null) 
-                        oneDialogue.IsBGChange = true;
-                    if(preData!=null && preData.BGImage!=obj.BGImage)
-                    {
-                        oneDialogue.IsBGChange = true;
-                   //      Debug.Log(obj.Dialogue+":圖片不同，替換背景圖片:" + obj.BGImage);
-                    }
-                      
-                    if (Images.ContainsKey(obj.BGImage))
-                    {
-                  //     Debug.Log(obj.Dialogue+"，對白找到背景圖片:" + obj.BGImage);
-                        oneDialogue.BGImage = Images[obj.BGImage];
-                    }
+                    dialogueSet = new DialogueSet();
+                    dialogueFilter.Add(obj.GroupID, dialogueSet);
                 }
-
-                if (!string.IsNullOrWhiteSpace(obj.CenterImage))
-                {
-                    if(preData==null) 
-                        oneDialogue.IsCenterImgChange = true;
-                    if (preData != null && preData.CenterImage != obj.CenterImage)
-                    {
-                        oneDialogue.IsCenterImgChange = true;
-               //         Debug.Log(obj.Dialogue+":圖片不同，替換前景圖片:" + obj.CenterImage);
-                    }
-                    if (Images.ContainsKey(obj.CenterImage))
-                    {
-                 //         Debug.Log("找到鉗景圖片，放入對白:" + obj.CenterImage);
-                        oneDialogue.CenterImg = Images[obj.CenterImage];
-                    }
-                    else
-                    {
-                        //找不到圖片，可能是其他多媒體例如影片或是iframe
-//                        Debug.Log("找不到圖片，可能是其他多媒體例如影片或是iframe:" + obj.CenterImage);
-                        oneDialogue.CenterImg = null;
-                    }
-                }
-
-
-                if (dialogueFilter.ContainsKey(obj.GroupID))
-                {
-                    dialogueFilter[obj.GroupID].AdvanceDialogues.Add(oneDialogue);
-                }
-                else
-                {
-                    //Debug.Log("新增對話組:"+obj.GroupID); //每一組新的對話，都會重新設定背景圖片
-                    DialogueSet oneSet = new DialogueSet();
-                    oneSet.AdvanceDialogues.Add(oneDialogue);
-                    dialogueFilter.Add(obj.GroupID, oneSet);
-                }
+                dialogueSet.AdvanceDialogues.Add(oneDialogue);
                 preData = obj;
             }
             return dialogueFilter;
         }
+
+        private void ProcessBackgroundImage(DialogData obj, DialogData preData, DialogueActionUnit oneDialogue, Dictionary<string, Sprite> Images)
+        {
+            if(string.IsNullOrWhiteSpace(obj.BGImage))
+                return;
+            
+            if (obj.BGImage.EndsWith(PresetImageCommand.Hide.ToString()))
+            {
+                oneDialogue.BGImage = null;
+                oneDialogue.IsBGChange = true;
+            }
+            oneDialogue.IsBGChange = preData == null || preData.BGImage!=obj.BGImage;
+                
+            if (Images.TryGetValue(obj.BGImage, out var sprite))
+            {
+            //     Debug.Log(obj.Dialogue+"，對白找到背景圖片:" + obj.BGImage);
+                oneDialogue.BGImage = sprite;
+            }
+        }
+
+        private void ProcessCenterImage(DialogData obj, DialogData preData, DialogueActionUnit oneDialogue, Dictionary<string, Sprite> Images)
+        {
+            if(string.IsNullOrWhiteSpace(obj.CenterImage))
+                return;
+            
+            if (obj.CenterImage.EndsWith(PresetImageCommand.Hide.ToString()))
+            {
+                oneDialogue.CenterImg = null;
+                oneDialogue.IsCenterImgChange = true;
+            }
+            oneDialogue.IsCenterImgChange = preData == null || preData.CenterImage!=obj.CenterImage;
+                
+            if (Images.TryGetValue(obj.CenterImage, out var sprite))
+            {
+                oneDialogue.CenterImg = sprite;
+            }
+        }
+
         public string SpreedSheetName;
         public string WorkSheetName;
         public async Task loadDataSets(string SpreadSheet, string WorkSheet, string UserAccount, string Token)
@@ -128,6 +116,9 @@ namespace Cameo
                       FastAPISettings.TokenKey, Token,
                       FastAPISettings.SpreadSheetKey, SpreadSheet,
                       FastAPISettings.WorkSheetKey, WorkSheet);
+#if UNITY_EDITOR
+            Debug.Log(url);
+#endif
             try
             {
 
@@ -211,7 +202,9 @@ namespace Cameo
                 }
             }
             yield return imageDownloadHelper.DownloadImages(imageURL);
+            Debug.Log("下載圖片完成");
             DialogueSets = dialogueDownloadSets.GetDialogueSetByGroupID(imageDownloadHelper.LoadedImages);
+            Debug.Log("圖片 ID 設置完成");
         }
 
         public void ShowDialogue(string GroupID, UnityAction OnDialogueEnd = null)
