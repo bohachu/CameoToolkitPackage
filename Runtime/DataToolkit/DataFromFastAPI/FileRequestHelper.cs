@@ -175,7 +175,7 @@ www.certificateHandler = cert;
             //Debug.Log(url);
 
             UnityWebRequest www = new UnityWebRequest(url);
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
 var cert = new ForceAcceptAll();
 www.certificateHandler = cert;
 #endif
@@ -605,7 +605,7 @@ www.certificateHandler = cert;
             form.AddBinaryData(FastAPISettings.UploadFileKey, file, fileName, "image/jpeg");
 
             UnityWebRequest www = UnityWebRequest.Post(url, form);
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
 var cert = new ForceAcceptAll();
 www.certificateHandler = cert;
 #endif
@@ -689,6 +689,7 @@ www.certificateHandler = cert;
 
             Debug.Log(www.url);
             Debug.Log(jsonStr);
+            Debug.Log($"Request Body: {JsonConvert.SerializeObject(requestBody, Formatting.Indented)}");
             www.disposeUploadHandlerOnDispose = true;
             www.disposeDownloadHandlerOnDispose = true;
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonStr);
@@ -772,7 +773,7 @@ www.certificateHandler = cert;
 
                 for (int i = 0; i < returnArray.Length; ++i)
                 {
-                    Debug.Log(jsonData[i].ToString());
+                    Debug.Log($"第 {i+1} 筆資料: {string.Join(", ", JsonMapper.ToObject<string[]>(jsonData[i].ToJson()))}");
                     returnArray[i] = parser(JsonMapper.ToObject<string[]>(jsonData[i].ToJson()));
                 }
             }
