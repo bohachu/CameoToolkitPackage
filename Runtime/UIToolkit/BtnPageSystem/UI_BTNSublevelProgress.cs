@@ -4,29 +4,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cameo.UI;
 
-
 // 需要把BTNMenuPage的private List<BTNUISet> buttons 改成 public
 
 public class UI_BTNSublevelProgress : MonoBehaviour
 {
-    //001 public Image ActiveProgress; // 进度条的 Image 组件 
+    //001 public Image ActiveProgress; // 進度條的 Image 組件 
     [SerializeField]
-    private Image ActiveProgress; // 进度条的 Image 组件
+    private Image ActiveProgress; // 進度條的 Image 組件
 
     void Start()
     {
         //Debug.Log("Starting SublevelProgress");
-        // 获取进度条的 Image 组件
+        // 獲取進度條的 Image 組件
         StartCoroutine(InitializeProgress());
     }
 
     private IEnumerator InitializeProgress()
     {
         //Debug.Log("進度條進度更新 - 開始協程");
-        // 等待一帧确保所有 Start 方法被调用
+        // 等待一幀確保所有 Start 方法被調用
         yield return null;
         //Debug.Log("進度條進度更新 - 繼續執行");
-        // 获取进度条的父 Button 组件
+        // 獲取進度條的父 Button 組件
         Button parentButton = GetComponentInParent<Button>();
 
         Page_BTNMenuPage pageScript = transform.parent.parent.parent.parent.GetComponent<Page_BTNMenuPage>(); // 调整路径以指向正确的父对象
@@ -34,10 +33,10 @@ public class UI_BTNSublevelProgress : MonoBehaviour
         {
             foreach (BTNUISet btnSet in pageScript.buttons)
             {
-                // 检查 BTNUISet 中的 button 是否为进度条的父 Button
+                // 檢查 BTNUISet 中的 button 是否為進度條的父 Button
                 if (btnSet.button == parentButton)
                 {
-                    // 找到对应的 BTNUISet
+                    // 找到對應的 BTNUISet
                     StartCoroutine(UpdateProgress(btnSet));
                     break;
                 }
@@ -80,26 +79,43 @@ public class UI_BTNSublevelProgress : MonoBehaviour
         }
         //Debug.Log(button.bntData.NextPageIndexID + " level progress: "+ progress);
 
-        // 根据进度数据更新进度条
+        // 根據進度數據更新進度條
         ActivateProgress(progress);
     }
     //003 extract as method
     protected virtual void ActivateProgress(int progress)
     {
-        switch (progress)
+        // 獲取總進度數量
+        int totalProgress = 3; // 預設值為3，保持與現有程式碼相容
+        
+        // 獲取父級按鈕
+        Button parentButton = GetComponentInParent<Button>();
+        if (parentButton != null)
         {
-            case 1:
-                ActiveProgress.fillAmount = 0.33f; // 进度为 1 时显示 1/3
-                break;
-            case 2:
-                ActiveProgress.fillAmount = 0.67f; // 进度为 2 时显示 2/3
-                break;
-            case 3:
-                ActiveProgress.fillAmount = 1.0f; // 进度为 3 时显示完整进度
-                break;
-            default:
-                ActiveProgress.fillAmount = 0f; // 默认情况，无进度
-                break;
+            Page_BTNMenuPage pageScript = transform.parent.parent.parent.parent.GetComponent<Page_BTNMenuPage>();
+            if (pageScript != null)
+            {
+                foreach (BTNUISet btnSet in pageScript.buttons)
+                {
+                    if (btnSet.button == parentButton && btnSet.bntData != null)
+                    {
+                        string sublevelID = btnSet.bntData.NextPageIndexID;
+                        if (!string.IsNullOrEmpty(sublevelID))
+                        {
+                            List<BTNData> sublevelData = UI_BTNDataManager.Instance.GetBTNData(sublevelID);
+                            if (sublevelData != null)
+                            {
+                                totalProgress = sublevelData.Count;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
+
+        // 計算進度比例
+        float progressRatio = totalProgress > 0 ? (float)progress / totalProgress : 0f;
+        ActiveProgress.fillAmount = progressRatio;
     }
 }
