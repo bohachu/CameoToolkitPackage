@@ -195,6 +195,10 @@ namespace Cameo.UI
                     if (!string.IsNullOrEmpty(sublevelID)){
                         Debug.Log("SetBtnLockByState[sublevel]: NextPageIndexID: " + sublevelID);
                         List<BTNData> sublevelData = UI_BTNDataManager.Instance.GetBTNData(sublevelID);
+                        
+                        // 動態獲取子關卡總數
+                        int totalProgress = sublevelData != null ? sublevelData.Count : 0;
+                        
                         for (int j = 0; j< sublevelData.Count; j++)
                         {
                             var sublevelProcess = UI_BTNDataManager.Instance.GetMissionData(sublevelID, sublevelData[j].BTNID);
@@ -204,7 +208,9 @@ namespace Cameo.UI
                             }
                             progress += 1;
                         }
-                        if (progress != 3){
+                        
+                        // 動態判斷：當完成數不等於總數時顯示鎖定圖片
+                        if (progress != totalProgress){
                             if (btn.LockImg != null)
                                 btn.image.sprite = btn.LockImg;
                         }
